@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
+<link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b3d2e">
@@ -66,6 +67,8 @@ select{width:100%;padding:9px;border-radius:8px;border:1px solid #ffffff33;backg
 .note{font-size:.78rem;color:var(--mut);margin-top:6px;line-height:1.45}
 .ovl{position:fixed;inset:0;background:#000c;display:flex;align-items:center;justify-content:center;z-index:99;padding:24px}
 .ovl.hide{display:none}
+.ar{font-size:1.25rem;line-height:2;direction:rtl;text-align:right;margin:8px 0 2px;color:#fbe7a1;font-family:"Amiri","Scheherazade New","Noto Naskh Arabic",serif}
+#tabM p{margin-top:4px}#tabM li{margin-top:4px}
 .ovl .box{background:var(--card);border:2px solid var(--gold);border-radius:18px;padding:24px;text-align:center;width:100%;max-width:360px}
 .ovl .box h2{color:var(--gold);font-size:1.6rem;margin:6px 0}
 </style>
@@ -169,7 +172,78 @@ select{width:100%;padding:9px;border-radius:8px;border:1px solid #ffffff33;backg
   <div class="card small">Sumber waktu: <b>e-Solat JAKIM</b> (melalui api.waktusolat.app, sandaran terus ke e-solat.gov.my). Imsak = 10 minit sebelum Subuh. Data sebulan disimpan dalam telefon supaya boleh dilihat tanpa internet.</div>
 </section>
 
-<nav class="tabs"><button id="tQ" class="on"><i>🧭</i>Qiblat</button><button id="tW"><i>🕌</i>Waktu Solat</button></nav>
+<section id="tabM" class="hide">
+  <h2 style="text-align:center;font-size:1.05rem;margin-top:10px">🧳 Panduan Solat Musafir</h2>
+  <div class="sub">Ikut Fatwa Negeri Kedah (29 Okt 2022): 2 marhalah = 81 km darat / 43.74 batu nautika laut</div>
+
+  <div class="card">
+    <h3>🏠 Lokasi rumah (tempat bermastautin)</h3>
+    <div id="mHomeTxt" class="small">Belum ditetapkan</div>
+    <button class="btn sec" id="mHomeGps">📍 Tetapkan lokasi semasa sebagai rumah</button>
+    <label>atau cari nama tempat / alamat</label>
+    <div class="row"><input id="mHomeQ" placeholder="cth: Taman Seri Putra, Alor Setar"><button class="btn sec" id="mHomeS" style="flex:0 0 70px;margin-top:4px;padding:9px">Cari</button></div>
+    <div id="mHomeR"></div>
+  </div>
+
+  <div class="card">
+    <h3>📍 Destinasi</h3>
+    <div class="seg"><button id="mDNow" class="on">Lokasi saya sekarang</button><button id="mDSearch">Cari destinasi</button></div>
+    <div id="mDBox" class="hide">
+      <div class="row"><input id="mDQ" placeholder="cth: Kuah, Langkawi"><button class="btn sec" id="mDS" style="flex:0 0 70px;margin-top:4px;padding:9px">Cari</button></div>
+      <div id="mDR"></div>
+    </div>
+    <div id="mDTxt" class="small" style="margin-top:6px"></div>
+    <label>Jenis perjalanan</label>
+    <div class="seg"><button id="mRoad" class="on">🚗 Darat (termasuk feri)</button><button id="mSea">⛴️ Laut</button></div>
+    <button class="btn" id="mCheck">Semak had jarak</button>
+    <div id="mRes"></div>
+  </div>
+
+  <div class="card">
+    <h3>📅 Tempoh menetap di destinasi</h3>
+    <label>Berapa hari anda berniat menetap? (tidak termasuk hari tiba dan hari keluar)</label>
+    <input id="mDays" type="number" min="0" step="1" placeholder="cth: 2">
+    <div id="mDaysRes" class="note"></div>
+  </div>
+
+  <div class="card">
+    <h3>🕒 Waktu jamak hari ini (ikut zon JAKIM anda)</h3>
+    <div id="mWin" class="small">Pilih zon di tab Waktu Solat dahulu.</div>
+  </div>
+
+  <div class="card"><details open><summary>Syarat harus jamak &amp; qasar</summary>
+    <ol style="margin:8px 0 0 18px">
+      <li>Jarak perjalanan sehala ke destinasi <b>81 km atau lebih</b> (darat) atau <b>43.74 batu nautika</b> (laut). Ukuran ini <i>taqribi</i> (anggaran).</li>
+      <li>Diukur ikut <b>laluan terdekat</b> yang lazim. Sengaja memilih jalan jauh semata-mata untuk cukupkan jarak <b>tidak dibenarkan</b>.</li>
+      <li>Rukhsah bermula setelah <b>keluar dari sempadan kampung / taman perumahan / mukim</b> tempat tinggal, bukan dari pintu rumah.</li>
+      <li>Destinasi perjalanan <b>jelas</b> (bukan merayau tanpa tujuan) dan perjalanan <b>bukan untuk maksiat</b>.</li>
+      <li>Tidak berniat menetap <b>4 hari atau lebih</b> (tidak termasuk hari tiba &amp; keluar). Jika berniat begitu, rukhsah hanya sepanjang perjalanan; sebaik tiba, solat seperti biasa.</li>
+      <li>Jika menetap kurang 4 hari, boleh jamak &amp; qasar selama 3 hari (tidak termasuk hari tiba &amp; keluar) dan sepanjang perjalanan pergi &amp; balik.</li>
+    </ol></details></div>
+
+  <div class="card"><details><summary>Qasar (memendekkan)</summary>
+    <p style="margin-top:8px">Solat 4 rakaat sahaja dipendekkan kepada 2 rakaat: <b>Zohor, Asar, Isyak</b>. Subuh (2) dan Maghrib (3) <b>tidak</b> boleh diqasar.</p>
+    <p style="margin-top:6px">Syarat: berniat qasar ketika takbiratul ihram; tidak berimamkan orang yang solat penuh (jika berimamkan orang yang bermukim, wajib solat penuh); masih musafir sehingga selesai solat.</p>
+    <p style="margin-top:6px"><b>Contoh niat (dalam hati):</b> "Sahaja aku solat fardu Zohor dua rakaat qasar kerana Allah Taala."</p>
+  </details></div>
+
+  <div class="card"><details><summary>Jamak (menghimpunkan)</summary>
+    <p style="margin-top:8px">Pasangan yang boleh dijamak: <b>Zohor + Asar</b> dan <b>Maghrib + Isyak</b>. Subuh tidak boleh dijamak.</p>
+    <p style="margin-top:6px"><b>Jamak Taqdim</b> (dalam waktu pertama, cth. Asar ditarik ke waktu Zohor): (1) mesti tertib, solat pertama dahulu; (2) niat jamak dalam solat pertama, sebelum salam; (3) berturut-turut tanpa diselangi perbuatan lain yang lama; (4) masih musafir hingga mula solat kedua.</p>
+    <p style="margin-top:6px"><b>Jamak Takhir</b> (dalam waktu kedua, cth. Zohor dilewatkan ke waktu Asar): (1) berniat untuk takhir ketika masih dalam waktu solat pertama; (2) masih musafir hingga selesai kedua-dua solat. Tertib tidak disyaratkan.</p>
+    <p style="margin-top:6px"><b>Contoh niat:</b> "Sahaja aku solat fardu Zohor dua rakaat qasar dihimpunkan bersama Asar secara jamak taqdim kerana Allah Taala."</p>
+  </details></div>
+
+  <div class="card"><details><summary>Perjalanan laut &amp; udara</summary>
+    <p style="margin-top:8px">Fatwa Kedah menetapkan had laut <b>43.74 batu nautika (81 km)</b>. Bagi perjalanan feri/bot, jarak diukur ikut laluan air terdekat antara jeti/pantai; app mengira jarak garis lurus (great-circle), iaitu jarak terdekat yang mungkin di atas air. Jika perjalanan bercampur darat + feri, pilih mod <b>Darat</b> supaya laluan feri dimasukkan dalam kiraan.</p>
+    <p style="margin-top:6px">Solat di atas kapal/feri: jika mampu, berdiri dan menghadap qiblat (guna tab Qiblat); jika tidak mampu, solat mengikut kemampuan dan menghadap arah yang boleh.</p>
+  </details></div>
+
+  <div class="card small">Rujukan: Keputusan Jawatankuasa Fatwa Negeri Kedah (29 Okt 2022) kadar dua marhalah; Jabatan Mufti Wilayah Persekutuan, Al-Kafi #255 &amp; #1181. Panduan ini ringkasan umum; rujuk Jabatan Mufti Negeri Kedah untuk kes khusus. Jarak jalan dikira melalui OpenStreetMap (OSRM); semak juga di Google Maps/Waze.</div>
+</section>
+
+
+<nav class="tabs"><button id="tQ" class="on"><i>🧭</i>Qiblat</button><button id="tW"><i>🕌</i>Waktu Solat</button><button id="tM"><i>🧳</i>Musafir</button></nav>
 <div class="ovl hide" id="ovl"><div class="box"><div class="small" id="ovlSub">Telah masuk waktu</div><h2 id="ovlName">Zohor</h2><div class="small" id="ovlZone"></div><button class="btn" id="ovlStop">⏹ Hentikan</button></div></div>
 
 <script>
@@ -528,8 +602,8 @@ let wl=null;
 async function applyWake(){try{if(cfg.wake&&document.visibilityState==='visible'&&'wakeLock' in navigator){if(!wl){wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>wl=null);}}else if(wl){await wl.release();wl=null;}}catch(e){}}
 
 /* ---------- UI ---------- */
-function showTab(w){$('tabQ').classList.toggle('hide',w);$('tabW').classList.toggle('hide',!w);$('tQ').classList.toggle('on',!w);$('tW').classList.toggle('on',w);LS.set('ws_tab',w?1:0);if(w)render();window.scrollTo(0,0);}
-$('tQ').onclick=()=>showTab(false); $('tW').onclick=()=>showTab(true);
+function showTab(w){w=+w||0;['tabQ','tabW','tabM'].forEach((id,i)=>$(id).classList.toggle('hide',i!==w));['tQ','tW','tM'].forEach((id,i)=>$(id).classList.toggle('on',i===w));LS.set('ws_tab',w);if(w===1)render();if(w===2&&window.renderMusafir)renderMusafir();window.scrollTo(0,0);}
+$('tQ').onclick=()=>showTab(0); $('tW').onclick=()=>showTab(1); $('tM').onclick=()=>showTab(2);
 function setMode(m){cfg.mode=m;save();$('zGps').classList.toggle('on',m==='gps');$('zMan').classList.toggle('on',m==='man');$('zManBox').classList.toggle('hide',m!=='man');}
 $('zGps').onclick=()=>{setMode('gps');sync(true);};
 $('zMan').onclick=()=>{setMode('man');if(!zones)loadZones();};
@@ -553,16 +627,117 @@ $('sTest').onclick=async()=>{unlock();if('Notification' in window&&Notification.
 
 /* ---------- start ---------- */
 setMode(cfg.mode); showAz(); permTxt(); if(zones)fillZones(); else loadZones();
-if(LS.get('ws_tab',0))showTab(true);
+{const t=LS.get('ws_tab',0);if(t)setTimeout(()=>showTab(t),0);}
 render();
 const stale=Date.now()-LS.get('ws_synced',0)>3*864e5;
-if(cfg.zone&&!days[ymd(Date.now()+864e5)]||stale) sync(false); else if(!cfg.zone&&cfg.mode==='gps'&&LS.get('ws_tab',0)) sync(false);
+if(cfg.zone&&!days[ymd(Date.now()+864e5)]||stale) sync(false); else if(!cfg.zone&&cfg.mode==='gps'&&LS.get('ws_tab',0)==1) sync(false);
 let lastDay=ymd(Date.now());
 setInterval(()=>{checkAlerts();tickNext();const d=ymd(Date.now());if(d!==lastDay){lastDay=d;render();if(!days[ymd(Date.now()+864e5)])sync(false);}},1000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){checkAlerts();render();}applyWake();});
 applyWake();
 })();
 </script>
+<script>
+/* ================= MUSAFIR ================= */
+(function(){
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const LIMIT=81, NM=1.852;
+let home=LS.get('mf_home',null), dest=null, destMode='now', trip='road';
+const R=Math.PI/180;
+function gc(a,b){const dp=(b.lat-a.lat)*R,dl=(b.lon-a.lon)*R;const x=Math.sin(dp/2)**2+Math.cos(a.lat*R)*Math.cos(b.lat*R)*Math.sin(dl/2)**2;return 6371.0088*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+const km=v=>v.toLocaleString('ms-MY',{maximumFractionDigits:1})+' km';
+const short=n=>n.split(',').slice(0,3).join(',');
+function showHome(){$('mHomeTxt').innerHTML=home?`🏠 <b>${home.name}</b><br>${home.lat.toFixed(5)}, ${home.lon.toFixed(5)}`:'Belum ditetapkan';}
+function gps(){return new Promise((res,rej)=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy}),e=>rej(new Error(e.message)),{enableHighAccuracy:true,timeout:20000,maximumAge:30000}):rej(new Error('GPS tidak disokong')));}
+async function geocode(q,box,pick){
+  if(!q.trim())return; $(box).innerHTML='<div class="note">Mencari…</div>';
+  try{const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=6&accept-language=ms&countrycodes=my,sg,th,bn,id&q=${encodeURIComponent(q)}`);const j=await r.json();
+    if(!j.length){$(box).innerHTML='<div class="note warn">Tiada hasil. Cuba nama lain.</div>';return;}
+    $(box).innerHTML=j.map((x,i)=>`<button class="btn sec" data-i="${i}" style="text-align:left;font-weight:500;font-size:.85rem;padding:10px;margin-top:6px">${short(x.display_name)}</button>`).join('');
+    $(box).querySelectorAll('button').forEach(b=>b.onclick=()=>{const x=j[+b.dataset.i];pick({lat:+x.lat,lon:+x.lon,name:short(x.display_name)});$(box).innerHTML='';});
+  }catch(e){$(box).innerHTML=`<div class="note warn">Carian gagal (${e.message}). Perlu internet.</div>`;}
+}
+$('mHomeGps').onclick=async()=>{$('mHomeTxt').textContent='Mendapatkan lokasi…';try{const p=await gps();home={lat:p.lat,lon:p.lon,name:'Lokasi rumah (GPS)'};LS.set('mf_home',home);showHome();}catch(e){$('mHomeTxt').innerHTML=`<span class="warn">GPS gagal: ${e.message}</span>`;}};
+$('mHomeS').onclick=()=>geocode($('mHomeQ').value,'mHomeR',p=>{home=p;LS.set('mf_home',home);showHome();});
+$('mHomeQ').onkeydown=e=>{if(e.key==='Enter')$('mHomeS').click();};
+function setDMode(m){destMode=m;$('mDNow').classList.toggle('on',m==='now');$('mDSearch').classList.toggle('on',m!=='now');$('mDBox').classList.toggle('hide',m==='now');if(m==='now'){dest=null;$('mDTxt').textContent='Lokasi semasa akan diambil melalui GPS.';}else $('mDTxt').textContent=dest?`🎯 ${dest.name}`:'';}
+$('mDNow').onclick=()=>setDMode('now'); $('mDSearch').onclick=()=>setDMode('search');
+$('mDS').onclick=()=>geocode($('mDQ').value,'mDR',p=>{dest=p;$('mDTxt').textContent=`🎯 ${p.name}`;});
+$('mDQ').onkeydown=e=>{if(e.key==='Enter')$('mDS').click();};
+function setTrip(t){trip=t;$('mRoad').classList.toggle('on',t==='road');$('mSea').classList.toggle('on',t==='sea');}
+$('mRoad').onclick=()=>setTrip('road'); $('mSea').onclick=()=>setTrip('sea');
+
+async function roadKm(a,b){
+  const u=`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false&alternatives=3`;
+  const r=await fetch(u); if(!r.ok)throw new Error('HTTP '+r.status); const j=await r.json();
+  if(j.code!=='Ok'||!j.routes||!j.routes.length)throw new Error(j.code||'tiada laluan');
+  return Math.min(...j.routes.map(x=>x.distance))/1000;
+}
+function verdictHTML(ok,title,detail){
+  const c=ok===true?'var(--ok)':ok===false?'var(--warn)':'var(--gold)';
+  const ic=ok===true?'✅':ok===false?'⛔':'❔';
+  return `<div style="margin-top:12px;border:2px solid ${c};border-radius:12px;padding:12px"><div style="font-weight:700;color:${c};font-size:1.05rem">${ic} ${title}</div><div style="margin-top:6px">${detail}</div></div>`;
+}
+$('mCheck').onclick=async()=>{
+  if(!home){$('mRes').innerHTML=verdictHTML(null,'Tetapkan lokasi rumah dahulu','');return;}
+  $('mRes').innerHTML='<div class="note">Mengira…</div>';
+  let d=dest;
+  if(destMode==='now'){try{const p=await gps();d={lat:p.lat,lon:p.lon,name:'Lokasi semasa'};$('mDTxt').textContent=`📍 Lokasi semasa: ${p.lat.toFixed(4)}, ${p.lon.toFixed(4)} (±${Math.round(p.acc)} m)`;}catch(e){$('mRes').innerHTML=verdictHTML(null,'GPS gagal',e.message);return;}}
+  if(!d){$('mRes').innerHTML=verdictHTML(null,'Pilih destinasi dahulu','');return;}
+  const s=gc(home,d);
+  const gmap=`https://www.google.com/maps/dir/?api=1&origin=${home.lat},${home.lon}&destination=${d.lat},${d.lon}`;
+  const verify=`<div class="note">Semak laluan: <a href="${gmap}" target="_blank" rel="noopener" style="color:var(--gold)">Google Maps</a></div>`;
+  let h='';
+  if(trip==='sea'){
+    const nm=s/NM, ok=s>=LIMIT;
+    h=verdictHTML(ok, ok?'Had 2 marhalah (laut) DILEPASI':'Belum mencapai had 2 marhalah (laut)',
+      `Jarak laut terdekat (garis lurus): <b>${km(s)}</b> = <b>${nm.toFixed(2)} batu nautika</b><br>Had: 81 km / 43.74 batu nautika · ${ok?'lebihan':'kurang'} ${km(Math.abs(s-LIMIT))}`+
+      (Math.abs(s-LIMIT)<5?'<br><span class="warn">Hampir dengan had. Ukuran 2 marhalah adalah anggaran; berhati-hati (ihtiyat).</span>':''));
+  } else {
+    let r=null,err='';
+    try{r=await roadKm(home,d);}catch(e){err=e.message;}
+    if(r!=null){
+      const ok=r>=LIMIT;
+      h=verdictHTML(ok, ok?'Had 2 marhalah DILEPASI':'Belum mencapai had 2 marhalah',
+        `Laluan terdekat (jalan raya/feri): <b>${km(r)}</b><br>Garis lurus: ${km(s)} · Had: 81 km · ${ok?'lebihan':'kurang'} ${km(Math.abs(r-LIMIT))}`+
+        (Math.abs(r-LIMIT)<5?'<br><span class="warn">Hampir dengan had. Ukuran 2 marhalah adalah anggaran; berhati-hati (ihtiyat) dan semak laluan sebenar.</span>':''));
+    } else if(s>=LIMIT){
+      h=verdictHTML(true,'Had 2 marhalah DILEPASI',`Garis lurus sahaja sudah <b>${km(s)}</b>, jadi laluan jalan pasti lebih jauh daripada 81 km.<br><span class="note">(Jarak jalan tidak dapat dikira: ${err})</span>`);
+    } else if(s<LIMIT/1.5){
+      h=verdictHTML(false,'Hampir pasti belum mencapai had',`Garis lurus ${km(s)}. Jarak jalan biasanya tidak sampai 1.5× garis lurus.<br><span class="note">(Jarak jalan tidak dapat dikira: ${err})</span>`);
+    } else {
+      h=verdictHTML(null,'Tidak dapat dipastikan',`Garis lurus ${km(s)}. Jarak jalan mungkin melebihi atau kurang 81 km. Semak jarak laluan terdekat di Google Maps/Waze.<br><span class="note">(${err})</span>`);
+    }
+  }
+  $('mRes').innerHTML=h+verify+'<div class="note">Jarak diukur dari titik rumah; rukhsah hanya bermula selepas keluar sempadan kampung/taman/mukim anda.</div>';
+};
+$('mDays').oninput=()=>{const n=parseInt($('mDays').value,10);let t='';
+  if(isNaN(n))t='';
+  else if(n>=4)t='<span class="warn">Berniat menetap 4 hari atau lebih: anda boleh jamak &amp; qasar <b>semasa perjalanan sahaja</b>. Sebaik tiba di destinasi, solat penuh seperti biasa (status mukim).</span>';
+  else t='<span style="color:var(--ok)">Kurang 4 hari: boleh jamak &amp; qasar sepanjang perjalanan dan di destinasi (maksimum 3 hari, tidak termasuk hari tiba &amp; keluar), jika syarat jarak dipenuhi.</span>';
+  $('mDaysRes').innerHTML=t;};
+const TZ='Asia/Kuala_Lumpur';
+const ymd=ms=>new Date(ms+8*3600e3).toISOString().slice(0,10);
+const fmt=ms=>new Date(ms).toLocaleTimeString('ms-MY',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:TZ}).replace(/\s?(PG|PTG|AM|PM)/i,m=>' '+m.trim().toLowerCase());
+function wins(){
+  const days=LS.get('ws_days',{}), t=days[ymd(Date.now())], tm=days[ymd(Date.now()+864e5)];
+  if(!t){$('mWin').textContent='Tiada data waktu solat. Segerak di tab Waktu Solat dahulu.';return;}
+  const now=Date.now(), row=(nm,a,b,note)=>{const on=now>=a&&now<b;return `<div class="prow${on?' cur':''}" style="padding:9px 0"><span class="pn">${nm}<br><span class="small">${note}</span></span><span class="pt" style="font-size:.95rem">${fmt(a)} – ${fmt(b)}</span></div>`;};
+  $('mWin').innerHTML=
+    row('Zohor + Asar · Taqdim',t.dhuhr,t.asr,'dalam waktu Zohor')+
+    row('Zohor + Asar · Takhir',t.asr,t.maghrib,'dalam waktu Asar (niat takhir dalam waktu Zohor)')+
+    row('Maghrib + Isyak · Taqdim',t.maghrib,t.isha,'dalam waktu Maghrib')+
+    row('Maghrib + Isyak · Takhir',t.isha,tm?tm.fajr:t.isha+9*3600e3,'dalam waktu Isyak (niat takhir dalam waktu Maghrib)')+
+    '<div class="note">Waktu tamat ialah sebelum masuk waktu berikutnya. Waktu mengikut zon solat yang dipilih; jika anda sudah berada di zon lain, segerak semula ikut lokasi.</div>';
+}
+window.renderMusafir=()=>{showHome();wins();};
+setInterval(()=>{if(!$('tabM').classList.contains('hide'))wins();},30000);
+showHome(); setDMode('now'); wins();
+})();
+</script>
+
+
 
 </body>
 </html>
