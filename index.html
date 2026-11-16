@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b3d2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Kompas Qiblat</title>
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Kompas%20Qiblat%22%2C%22short_name%22%3A%22Qiblat%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230b3d2e%22%2C%22theme_color%22%3A%22%230b3d2e%22%7D">
+<style>
+:root{--bg:#0b3d2e;--bg2:#0f4f3c;--card:#135943;--gold:#e8c468;--txt:#f3f1e8;--mut:#b7cfc4;--ok:#3ddc84;--warn:#ffb347}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+body{padding:calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 20px);max-width:520px;margin:0 auto}
+h1{font-size:1.25rem;text-align:center;letter-spacing:.5px}
+.sub{text-align:center;color:var(--mut);font-size:.82rem;margin-top:2px}
+.dialWrap{position:relative;width:min(86vw,360px);aspect-ratio:1;margin:18px auto 8px}
+.pointer{position:absolute;left:50%;top:-14px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid var(--gold);z-index:3;filter:drop-shadow(0 2px 3px #0008)}
+.dial{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,#16654c 0%,#0d4636 70%,#09372a 100%);box-shadow:0 0 0 4px #e8c46855,inset 0 0 30px #0008;will-change:transform}
+.dial svg{width:100%;height:100%}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:2}
+.big{font-size:2.6rem;font-weight:700;font-variant-numeric:tabular-nums;text-shadow:0 2px 6px #000a}
+.small{font-size:.85rem;color:var(--mut)}
+.status{margin:6px auto 0;text-align:center;font-weight:600;font-size:1.05rem;min-height:1.4em}
+.aligned .dial{box-shadow:0 0 0 5px var(--ok),0 0 28px var(--ok),inset 0 0 30px #0008}
+.aligned .status{color:var(--ok)}
+.btn{display:block;width:100%;padding:14px;border:0;border-radius:12px;background:var(--gold);color:#1d1a0c;font-weight:700;font-size:1rem;margin-top:12px;cursor:pointer}
+.btn.sec{background:var(--card);color:var(--txt);border:1px solid #ffffff22}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.cell{background:var(--card);border-radius:10px;padding:10px}
+.cell b{display:block;font-size:1.1rem;font-variant-numeric:tabular-nums}
+.cell span{font-size:.75rem;color:var(--mut)}
+.card{background:var(--card);border-radius:12px;padding:12px 14px;margin-top:12px;font-size:.88rem;line-height:1.5;text-align:justify}
+.card h3{font-size:.95rem;margin-bottom:6px;color:var(--gold);text-align:left}
+.warn{color:var(--warn)}
+details summary{cursor:pointer;font-weight:600;color:var(--gold)}
+input{width:100%;padding:9px;border-radius:8px;border:1px solid #ffffff33;background:#0b3d2e;color:var(--txt);font-size:.95rem;margin-top:4px}
+label{font-size:.8rem;color:var(--mut);display:block;margin-top:8px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.hide{display:none}
+</style>
+</head>
+<body>
+<h1>🕋 Kompas Qiblat</h1>
+<div class="sub" id="locTxt">Lokasi belum diperoleh</div>
+
+<div class="dialWrap" id="wrap">
+  <div class="pointer"></div>
+  <div class="dial" id="dial"><svg id="svg" viewBox="0 0 200 200"></svg></div>
+  <div class="center">
+    <div class="big" id="diffTxt">--°</div>
+    <div class="small" id="diffSub">Tekan Mula</div>
+  </div>
+</div>
+<div class="status" id="status"></div>
+
+<button class="btn" id="startBtn">▶ Mula (GPS + Kompas)</button>
+
+<div class="grid">
+  <div class="cell"><span>Arah Qiblat (dari Utara Benar)</span><b id="qb">--</b></div>
+  <div class="cell"><span>Arah telefon sekarang</span><b id="hd">--</b></div>
+  <div class="cell"><span>Jarak ke Kaabah</span><b id="dist">--</b></div>
+  <div class="cell"><span>Ketepatan kompas / GPS</span><b id="acc">--</b></div>
+</div>
+
+<div class="card" id="calCard">
+  <h3>Sebelum guna</h3>
+  Pegang telefon <b>mendatar</b> (skrin menghadap ke atas), jauh daripada besi, magnet, kereta, speaker atau casing bermagnet. Untuk kalibrasi, gerakkan telefon membentuk angka <b>8</b> beberapa kali. Apabila anak panah emas di atas bertemu ikon Kaabah dan dail bertukar hijau, anda sedang menghadap qiblat.
+</div>
+
+<div class="card">
+  <h3>☀️ Semakan dengan matahari (paling tepat)</h3>
+  <div id="sunBox">Perlukan lokasi.</div>
+</div>
+
+<div class="card">
+  <details>
+    <summary>Tetapan lanjutan</summary>
+    <label>Deklinasi magnet (°, timur = +). Di Malaysia kurang daripada 1°, boleh biar 0.</label>
+    <input id="decl" type="number" step="0.1" value="0">
+    <label>Lokasi manual (jika GPS tidak tersedia)</label>
+    <div class="row"><input id="mLat" type="number" step="any" placeholder="Latitud cth 6.1184"><input id="mLon" type="number" step="any" placeholder="Longitud cth 100.3685"></div>
+    <button class="btn sec" id="mBtn">Guna lokasi manual</button>
+  </details>
+</div>
+
+<div class="card small">
+  Kiraan menggunakan bulatan besar (great-circle) ke Kaabah (21.42252°U, 39.82621°T), kaedah yang sama digunakan dalam penentuan arah qiblat rasmi. Ketepatan akhir bergantung pada sensor kompas telefon; sahkan dengan kaedah matahari atau arah qiblat masjid berhampiran.
+</div>
+
+<script>
+(function(){
+const KAABA={lat:21.422524,lon:39.826206};
+const R=Math.PI/180, D=180/Math.PI;
+const $=id=>document.getElementById(id);
+let loc=null, qibla=null, heading=null, sinS=0, cosS=0, hasSm=false, lastVib=0, wasAligned=false, gotEvent=false;
+
+/* ---------- Dial drawing ---------- */
+function drawDial(){
+  const s=$('svg'); let h='';
+  for(let i=0;i<360;i+=5){
+    const long=i%30===0, len=long?10:5;
+    const a=(i-90)*R, r1=96, r2=96-len;
+    h+=`<line x1="${100+r1*Math.cos(a)}" y1="${100+r1*Math.sin(a)}" x2="${100+r2*Math.cos(a)}" y2="${100+r2*Math.sin(a)}" stroke="${long?'#f3f1e8':'#b7cfc4'}" stroke-width="${long?1.4:.7}"/>`;
+  }
+  const L={0:'U',90:'T',180:'S',270:'B'};
+  for(const k in L){const a=(k-90)*R;h+=`<text x="${100+74*Math.cos(a)}" y="${100+74*Math.sin(a)+5}" text-anchor="middle" font-size="14" font-weight="700" fill="${k==0?'#ff6b6b':'#f3f1e8'}">${L[k]}</text>`;}
+  if(qibla!==null){
+    const a=(qibla-90)*R;
+    h+=`<line x1="100" y1="100" x2="${100+60*Math.cos(a)}" y2="${100+60*Math.sin(a)}" stroke="#e8c468" stroke-width="2.5" stroke-dasharray="4 3"/>`;
+    const x=100+84*Math.cos(a), y=100+84*Math.sin(a);
+    h+=`<g transform="translate(${x},${y}) rotate(${qibla})"><rect x="-8" y="-8" width="16" height="16" rx="1.5" fill="#111" stroke="#e8c468" stroke-width="1.5"/><rect x="-8" y="-4" width="16" height="2.5" fill="#e8c468"/></g>`;
+  }
+  s.innerHTML=h;
+}
+
+/* ---------- Geodesy ---------- */
+function bearing(lat1,lon1,lat2,lon2){
+  const p1=lat1*R,p2=lat2*R,dl=(lon2-lon1)*R;
+  const y=Math.sin(dl)*Math.cos(p2), x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
+  return (Math.atan2(y,x)*D+360)%360;
+}
+function distKm(lat1,lon1,lat2,lon2){
+  const dp=(lat2-lat1)*R, dl=(lon2-lon1)*R;
+  const a=Math.sin(dp/2)**2+Math.cos(lat1*R)*Math.cos(lat2*R)*Math.sin(dl/2)**2;
+  return 6371.0088*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+const norm=a=>((a%360)+360)%360;
+const sdiff=a=>{a=norm(a);return a>180?a-360:a;};
+const fmt=a=>a.toFixed(1)+'°';
+
+/* ---------- Sun position (NOAA-style) ---------- */
+function sunPos(date,lat,lon){
+  const jd=date.getTime()/86400000+2440587.5, d=jd-2451545.0;
+  const g=norm(357.529+0.98560028*d)*R, q=norm(280.459+0.98564736*d);
+  const L=(q+1.915*Math.sin(g)+0.020*Math.sin(2*g))*R, e=(23.439-0.00000036*d)*R;
+  const ra=Math.atan2(Math.cos(e)*Math.sin(L),Math.cos(L)), dec=Math.asin(Math.sin(e)*Math.sin(L));
+  const gmst=norm((18.697374558+24.06570982441908*d)*15);
+  const H=(gmst+lon)*R-ra, phi=lat*R;
+  const alt=Math.asin(Math.sin(phi)*Math.sin(dec)+Math.cos(phi)*Math.cos(dec)*Math.cos(H));
+  const az=Math.atan2(-Math.sin(H),Math.tan(dec)*Math.cos(phi)-Math.sin(phi)*Math.cos(H));
+  return {alt:alt*D, az:norm(az*D)};
+}
+function hhmm(dt){return dt.toLocaleTimeString('ms-MY',{hour:'2-digit',minute:'2-digit'});}
+/* find today's times when shadow of a vertical pole points AWAY from qibla (sun az == qibla) or TO qibla (sun az == qibla+180) */
+function sunCross(target){
+  const out=[]; const now=new Date(); const t0=new Date(now); t0.setHours(0,0,0,0);
+  let prev=null;
+  for(let m=0;m<=1440;m+=2){
+    const t=new Date(t0.getTime()+m*60000), p=sunPos(t,loc.lat,loc.lon);
+    const dd=sdiff(p.az-target);
+    if(prev && p.alt>3 && Math.sign(dd)!==Math.sign(prev.dd) && Math.abs(dd-prev.dd)<90) out.push(t);
+    prev={dd};
+  }
+  return out;
+}
+function renderSun(){
+  if(!loc){return;}
+  const p=sunPos(new Date(),loc.lat,loc.lon);
+  let h='';
+  if(p.alt>2){
+    const shadow=norm(p.az+180), rel=norm(qibla-shadow);
+    h+=`Matahari sekarang pada azimut <b>${fmt(p.az)}</b> (ketinggian ${p.alt.toFixed(0)}°). Bayang batang tegak menghala ke <b>${fmt(shadow)}</b>.<br>`;
+    h+=`Qiblat = putar <b>${fmt(rel)}</b> ikut arah jam dari arah bayang.<br>`;
+  } else h+='Matahari di bawah ufuk sekarang.<br>';
+  const away=sunCross(qibla), to=sunCross(norm(qibla+180));
+  if(away.length) h+=`<br>Hari ini jam <b>${away.map(hhmm).join(', ')}</b>: matahari tepat di arah qiblat, jadi <b>bayang tegak menunjuk berlawanan qiblat</b> (hadap matahari = hadap qiblat).`;
+  if(to.length) h+=`<br>Hari ini jam <b>${to.map(hhmm).join(', ')}</b>: <b>bayang tegak menunjuk terus ke arah qiblat</b>.`;
+  if(!away.length&&!to.length) h+='<br>Tiada waktu hari ini di mana bayang selari dengan qiblat; guna kiraan sudut di atas.';
+  h+=`<br><br><span class="small">Rasdul Qiblat (matahari tegak atas Kaabah, sah seluruh dunia yang melihat matahari): <b>27/28 Mei ~5:16 ptg</b> dan <b>15/16 Julai ~5:28 ptg</b> waktu Malaysia.</span>`;
+  $('sunBox').innerHTML=h;
+}
+
+/* ---------- Location ---------- */
+function setLoc(lat,lon,acc){
+  loc={lat,lon,acc};
+  qibla=bearing(lat,lon,KAABA.lat,KAABA.lon);
+  $('qb').textContent=fmt(qibla);
+  $('dist').textContent=Math.round(distKm(lat,lon,KAABA.lat,KAABA.lon)).toLocaleString('ms-MY')+' km';
+  $('locTxt').textContent=`📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}`+(acc?` (±${Math.round(acc)} m)`:' (manual)');
+  try{localStorage.setItem('qiblat_loc',JSON.stringify({lat,lon}));}catch(e){}
+  drawDial(); renderSun(); updateAcc(); render();
+}
+function getGPS(){
+  if(!navigator.geolocation){$('status').textContent='GPS tidak disokong. Guna lokasi manual.';return;}
+  $('locTxt').textContent='Mendapatkan lokasi…';
+  navigator.geolocation.getCurrentPosition(
+    p=>setLoc(p.coords.latitude,p.coords.longitude,p.coords.accuracy),
+    err=>{$('locTxt').textContent='Lokasi gagal: '+err.message+'. Guna lokasi manual atau lokasi terakhir.';
+      try{const s=JSON.parse(localStorage.getItem('qiblat_loc'));if(s)setLoc(s.lat,s.lon,null);}catch(e){}},
+    {enableHighAccuracy:true,timeout:20000,maximumAge:0});
+}
+
+/* ---------- Compass ---------- */
+let compAcc=null;
+function screenAngle(){return (screen.orientation&&screen.orientation.angle)||window.orientation||0;}
+function onHeading(raw,accuracy){
+  gotEvent=true;
+  const decl=parseFloat($('decl').value)||0;
+  const h=norm(raw+screenAngle()+decl)*R;
+  if(!hasSm){sinS=Math.sin(h);cosS=Math.cos(h);hasSm=true;}
+  else{const k=0.18;sinS+=k*(Math.sin(h)-sinS);cosS+=k*(Math.cos(h)-cosS);}
+  heading=norm(Math.atan2(sinS,cosS)*D);
+  if(accuracy!=null) compAcc=accuracy;
+}
+function handleIOS(e){ if(e.webkitCompassHeading!=null) onHeading(e.webkitCompassHeading,e.webkitCompassAccuracy); }
+function handleAbs(e){ if(e.alpha!=null) onHeading(360-e.alpha,null); }
+function handleRel(e){ if(e.absolute&&e.alpha!=null) onHeading(360-e.alpha,null); }
+
+async function startCompass(){
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
+    try{const r=await DeviceOrientationEvent.requestPermission(); if(r!=='granted'){$('status').textContent='Izin kompas ditolak.';return;}}
+    catch(e){$('status').textContent='Izin kompas gagal: '+e.message;return;}
+    window.addEventListener('deviceorientation',handleIOS,true);
+  } else if('ondeviceorientationabsolute' in window){
+    window.addEventListener('deviceorientationabsolute',handleAbs,true);
+  } else {
+    window.addEventListener('deviceorientation',handleRel,true);
+  }
+  setTimeout(()=>{ if(!gotEvent) $('status').innerHTML='<span class="warn">Sensor kompas tidak dikesan. Guna darjah qiblat + kaedah matahari di bawah.</span>'; },3000);
+}
+
+function updateAcc(){
+  let a=[];
+  if(compAcc!=null) a.push(compAcc<0?'kompas ?':'±'+Math.round(compAcc)+'°');
+  if(loc&&loc.acc) a.push('±'+Math.round(loc.acc)+' m');
+  $('acc').textContent=a.length?a.join(' / '):'--';
+}
+
+/* ---------- Render loop ---------- */
+function render(){
+  if(heading!=null){
+    $('dial').style.transform=`rotate(${-heading}deg)`;
+    $('hd').textContent=fmt(heading);
+    if(qibla!=null){
+      const d=sdiff(qibla-heading), ad=Math.abs(d);
+      $('diffTxt').textContent=ad.toFixed(0)+'°';
+      const aligned=ad<=2;
+      $('wrap').classList.toggle('aligned',aligned); document.body.classList.toggle('aligned',aligned);
+      $('diffSub').textContent=aligned?'Menghadap Qiblat':(d>0?'Pusing ke kanan ↻':'Pusing ke kiri ↺');
+      $('status').textContent=aligned?'✅ Anda menghadap Qiblat':'';
+      if(aligned&&!wasAligned&&navigator.vibrate&&Date.now()-lastVib>1500){navigator.vibrate(120);lastVib=Date.now();}
+      wasAligned=aligned;
+      if(compAcc!=null&&compAcc>20) $('status').innerHTML='<span class="warn">Ketepatan kompas rendah — buat gerakan angka 8.</span>';
+    }
+  }
+  updateAcc();
+  requestAnimationFrame(render);
+}
+
+$('startBtn').onclick=()=>{ startCompass(); getGPS(); $('startBtn').textContent='↻ Kemas kini lokasi'; $('startBtn').onclick=getGPS; };
+$('mBtn').onclick=()=>{const a=parseFloat($('mLat').value),b=parseFloat($('mLon').value);
+  if(isFinite(a)&&isFinite(b)&&Math.abs(a)<=90&&Math.abs(b)<=180) setLoc(a,b,null); else $('status').textContent='Koordinat tidak sah.';};
+try{const s=JSON.parse(localStorage.getItem('qiblat_loc'));if(s)setLoc(s.lat,s.lon,null);}catch(e){}
+drawDial(); setInterval(()=>loc&&renderSun(),60000); requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>
