@@ -180,6 +180,7 @@ function setLoc(lat,lon,acc){
   $('dist').textContent=Math.round(distKm(lat,lon,KAABA.lat,KAABA.lon)).toLocaleString('ms-MY')+' km';
   $('locTxt').textContent=`📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}`+(acc?` (±${Math.round(acc)} m)`:' (manual)');
   try{localStorage.setItem('qiblat_loc',JSON.stringify({lat,lon}));}catch(e){}
+  if(/Koordinat|Lokasi|GPS/.test($('status').textContent)) $('status').textContent='';
   drawDial(); renderSun(); updateAcc(); render();
 }
 function getGPS(){
@@ -204,21 +205,48 @@ function onHeading(raw,accuracy){
   heading=norm(Math.atan2(sinS,cosS)*D);
   if(accuracy!=null) compAcc=accuracy;
 }
+let diag={abs:0,rel:0,relNull:0,sensor:''};
 function handleIOS(e){ if(e.webkitCompassHeading!=null) onHeading(e.webkitCompassHeading,e.webkitCompassAccuracy); }
-function handleAbs(e){ if(e.alpha!=null) onHeading(360-e.alpha,null); }
-function handleRel(e){ if(e.absolute&&e.alpha!=null) onHeading(360-e.alpha,null); }
+function handleAbs(e){ diag.abs++; if(e.alpha!=null) onHeading(360-e.alpha,null); }
+function handleRel(e){
+  diag.rel++; if(e.alpha==null) diag.relNull++;
+  if(e.webkitCompassHeading!=null) return handleIOS(e);
+  if(e.absolute&&e.alpha!=null&&!diag.abs) onHeading(360-e.alpha,null);
+}
+/* Fallback: Generic Sensor API (Chrome Android) */
+function trySensorAPI(){
+  if(!('AbsoluteOrientationSensor' in window)){diag.sensor='tiada API';return;}
+  try{
+    const s=new AbsoluteOrientationSensor({frequency:30,referenceFrame:'screen'});
+    s.addEventListener('reading',()=>{
+      const [x,y,z,w]=s.quaternion;
+      const h=Math.atan2(2*(x*y-z*w),1-2*(x*x+z*z))*D; // arah bahagian atas telefon, dari Utara
+      onHeading(norm(h)-screenAngle(),null); // referenceFrame:'screen' sudah ambil kira putaran skrin
+    });
+    s.addEventListener('error',ev=>{diag.sensor=ev.error.name; showDiag();});
+    s.start(); diag.sensor='dimulakan';
+  }catch(e){diag.sensor=e.name;}
+}
+function showDiag(){
+  if(gotEvent) return;
+  let why='';
+  if(diag.sensor==='NotAllowedError'||(diag.abs===0&&diag.rel===0))
+    why='Chrome menyekat <b>penderia gerakan</b>. Ketik ikon di kiri alamat laman → <b>Kebenaran / Permissions</b> → <b>Penderia gerakan (Motion sensors)</b> → Benarkan, kemudian muat semula. Atau: Chrome ⋮ → Tetapan → Tetapan tapak → Penderia gerakan.';
+  else if(diag.relNull>0||diag.sensor==='NotReadableError')
+    why='Telefon ini nampaknya <b>tiada magnetometer (kompas)</b> atau ia tidak boleh dibaca. Guna darjah qiblat + kaedah matahari di bawah.';
+  else why='Isyarat kompas tidak diterima.';
+  $('status').innerHTML=`<span class="warn">${why}</span><br><span class="small">Diag: abs=${diag.abs}, rel=${diag.rel}, null=${diag.relNull}, sensor=${diag.sensor}</span>`;
+}
 
 async function startCompass(){
   if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
     try{const r=await DeviceOrientationEvent.requestPermission(); if(r!=='granted'){$('status').textContent='Izin kompas ditolak.';return;}}
     catch(e){$('status').textContent='Izin kompas gagal: '+e.message;return;}
-    window.addEventListener('deviceorientation',handleIOS,true);
-  } else if('ondeviceorientationabsolute' in window){
-    window.addEventListener('deviceorientationabsolute',handleAbs,true);
-  } else {
-    window.addEventListener('deviceorientation',handleRel,true);
   }
-  setTimeout(()=>{ if(!gotEvent) $('status').innerHTML='<span class="warn">Sensor kompas tidak dikesan. Guna darjah qiblat + kaedah matahari di bawah.</span>'; },3000);
+  window.addEventListener('deviceorientationabsolute',handleAbs,true);
+  window.addEventListener('deviceorientation',handleRel,true);
+  setTimeout(()=>{ if(!gotEvent) trySensorAPI(); },1500);
+  setTimeout(showDiag,4000);
 }
 
 function updateAcc(){
