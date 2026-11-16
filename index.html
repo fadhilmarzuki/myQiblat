@@ -6,8 +6,12 @@
 <meta name="theme-color" content="#0b3d2e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Kompas Qiblat</title>
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Kompas%20Qiblat%22%2C%22short_name%22%3A%22Qiblat%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230b3d2e%22%2C%22theme_color%22%3A%22%230b3d2e%22%7D">
+<title>myQiblat</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="myQiblat">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 :root{--bg:#0b3d2e;--bg2:#0f4f3c;--card:#135943;--gold:#e8c468;--txt:#f3f1e8;--mut:#b7cfc4;--ok:#3ddc84;--warn:#ffb347}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -39,12 +43,38 @@ input{width:100%;padding:9px;border-radius:8px;border:1px solid #ffffff33;backgr
 label{font-size:.8rem;color:var(--mut);display:block;margin-top:8px}
 .row{display:flex;gap:8px}.row>*{flex:1}
 .hide{display:none}
+body{padding-bottom:calc(env(safe-area-inset-bottom) + 84px)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:#082a20;border-top:1px solid #e8c46844;padding-bottom:env(safe-area-inset-bottom);z-index:50}
+nav.tabs button{flex:1;background:none;border:0;color:var(--mut);padding:10px 0 12px;font-size:.8rem;font-weight:600}
+nav.tabs button i{display:block;font-style:normal;font-size:1.35rem;margin-bottom:2px}
+nav.tabs button.on{color:var(--gold)}
+.next{background:linear-gradient(135deg,#1a7a5a,#0f5540);border:1px solid #e8c46855;border-radius:16px;padding:16px;text-align:center;margin-top:14px}
+.next .nm{font-size:1rem;color:var(--gold);font-weight:700;letter-spacing:.5px}
+.next .cd{font-size:2.4rem;font-weight:700;font-variant-numeric:tabular-nums;margin:2px 0}
+.plist{margin-top:12px;background:var(--card);border-radius:12px;overflow:hidden}
+.prow{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid #ffffff14;gap:10px}
+.prow:last-child{border-bottom:0}
+.prow .pn{flex:1;font-weight:600}
+.prow .pt{font-size:1.15rem;font-weight:700;font-variant-numeric:tabular-nums;text-align:right;min-width:72px}
+.prow.cur{background:#e8c46826}.prow.cur .pn,.prow.cur .pt{color:var(--gold)}
+.prow.minor .pn,.prow.minor .pt{color:var(--mut);font-weight:500;font-size:.95rem}
+.bell{background:none;border:0;font-size:1.15rem;width:34px;opacity:.95}
+.bell.off{opacity:.35;filter:grayscale(1)}
+select{width:100%;padding:9px;border-radius:8px;border:1px solid #ffffff33;background:#0b3d2e;color:var(--txt);font-size:.95rem;margin-top:4px}
+.seg{display:flex;gap:6px;margin-top:6px}.seg button{flex:1;padding:9px;border-radius:8px;border:1px solid #ffffff33;background:#0b3d2e;color:var(--txt);font-weight:600}
+.seg button.on{background:var(--gold);color:#1d1a0c;border-color:var(--gold)}
+.note{font-size:.78rem;color:var(--mut);margin-top:6px;line-height:1.45}
+.ovl{position:fixed;inset:0;background:#000c;display:flex;align-items:center;justify-content:center;z-index:99;padding:24px}
+.ovl.hide{display:none}
+.ovl .box{background:var(--card);border:2px solid var(--gold);border-radius:18px;padding:24px;text-align:center;width:100%;max-width:360px}
+.ovl .box h2{color:var(--gold);font-size:1.6rem;margin:6px 0}
 </style>
 </head>
 <body>
-<h1>🕋 Kompas Qiblat</h1>
-<div class="sub" id="locTxt">Lokasi belum diperoleh</div>
+<h1><img src="icon-192.png" alt="" style="width:30px;height:30px;border-radius:8px;vertical-align:-7px;margin-right:6px">myQiblat</h1>
 
+<section id="tabQ">
+<div class="sub" id="locTxt">Lokasi belum diperoleh</div>
 <div class="dialWrap" id="wrap">
   <div class="pointer"></div>
   <div class="dial" id="dial"><svg id="svg" viewBox="0 0 200 200"></svg></div>
@@ -55,6 +85,7 @@ label{font-size:.8rem;color:var(--mut);display:block;margin-top:8px}
 </div>
 <div class="status" id="status"></div>
 
+<button class="btn sec hide" id="installBtn">📲 Pasang myQiblat di telefon</button>
 <button class="btn" id="startBtn">▶ Mula (GPS + Kompas)</button>
 
 <div class="grid">
@@ -88,6 +119,58 @@ label{font-size:.8rem;color:var(--mut);display:block;margin-top:8px}
 <div class="card small">
   Kiraan menggunakan bulatan besar (great-circle) ke Kaabah (21.42252°U, 39.82621°T), kaedah yang sama digunakan dalam penentuan arah qiblat rasmi. Ketepatan akhir bergantung pada sensor kompas telefon; sahkan dengan kaedah matahari atau arah qiblat masjid berhampiran.
 </div>
+
+</section>
+
+<section id="tabW" class="hide">
+  <div class="sub" id="wZoneTxt">Zon belum dipilih</div>
+  <div class="sub" id="wDateTxt"></div>
+  <div class="next">
+    <div class="nm" id="nextName">—</div>
+    <div class="cd" id="nextCd">--:--:--</div>
+    <div class="small" id="nextAt">Pilih zon atau guna lokasi</div>
+  </div>
+  <div class="plist" id="plist"></div>
+  <div class="status" id="wStatus"></div>
+
+  <div class="card">
+    <h3>📍 Zon waktu solat (JAKIM)</h3>
+    <div class="seg"><button id="zGps">Ikut lokasi (GPS)</button><button id="zMan">Pilih manual</button></div>
+    <div id="zManBox" class="hide">
+      <label>Zon</label>
+      <select id="zSel"><option value="">Memuatkan senarai zon…</option></select>
+    </div>
+    <button class="btn sec" id="zSync">🔄 Segerak semula dengan JAKIM</button>
+    <div class="note" id="zInfo"></div>
+  </div>
+
+  <div class="card">
+    <h3>🔔 Pemberitahuan azan</h3>
+    <label>Jenis bunyi</label>
+    <select id="sMode">
+      <option value="azan">Azan (fail audio pilihan anda)</option>
+      <option value="notif">Bunyi notifikasi telefon</option>
+      <option value="chime">Nada lembut (terbina dalam app)</option>
+      <option value="vib">Getar sahaja</option>
+    </select>
+    <div id="azanBox">
+      <label>Fail azan (MP3/M4A) — <span id="azanName">belum dipilih</span></label>
+      <input type="file" id="azanFile" accept="audio/*">
+      <label>Fail azan Subuh (pilihan) — <span id="azanSName">guna azan biasa</span></label>
+      <input type="file" id="azanSFile" accept="audio/*">
+    </div>
+    <label>Peringatan awal</label>
+    <select id="sPre"><option value="0">Tiada</option><option value="5">5 minit sebelum</option><option value="10">10 minit sebelum</option><option value="15">15 minit sebelum</option></select>
+    <div class="row"><button class="btn sec" id="sTest">▶ Uji bunyi</button><button class="btn sec" id="sPerm">Benarkan notifikasi</button></div>
+    <div class="note">Ketik ikon 🔔 di sebelah setiap waktu untuk hidup/matikan pemberitahuan waktu itu.</div>
+    <div class="note warn" id="bgNote">Penting: sebagai app web, myQiblat hanya boleh membunyikan azan dengan pasti ketika app <b>sedang dibuka</b> (boleh skrin malap). Jika app ditutup sepenuhnya, Android mungkin menangguhkan atau tidak menghantar pemberitahuan.</div>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:10px"><input type="checkbox" id="sWake" style="width:auto;margin:0"> Kekalkan skrin hidup semasa app dibuka (sesuai ketika dicas)</label>
+  </div>
+  <div class="card small">Sumber waktu: <b>e-Solat JAKIM</b> (melalui api.waktusolat.app, sandaran terus ke e-solat.gov.my). Imsak = 10 minit sebelum Subuh. Data sebulan disimpan dalam telefon supaya boleh dilihat tanpa internet.</div>
+</section>
+
+<nav class="tabs"><button id="tQ" class="on"><i>🧭</i>Qiblat</button><button id="tW"><i>🕌</i>Waktu Solat</button></nav>
+<div class="ovl hide" id="ovl"><div class="box"><div class="small" id="ovlSub">Telah masuk waktu</div><h2 id="ovlName">Zohor</h2><div class="small" id="ovlZone"></div><button class="btn" id="ovlStop">⏹ Hentikan</button></div></div>
 
 <script>
 (function(){
@@ -281,8 +364,205 @@ $('startBtn').onclick=()=>{ startCompass(); getGPS(); $('startBtn').textContent=
 $('mBtn').onclick=()=>{const a=parseFloat($('mLat').value),b=parseFloat($('mLon').value);
   if(isFinite(a)&&isFinite(b)&&Math.abs(a)<=90&&Math.abs(b)<=180) setLoc(a,b,null); else $('status').textContent='Koordinat tidak sah.';};
 try{const s=JSON.parse(localStorage.getItem('qiblat_loc'));if(s)setLoc(s.lat,s.lon,null);}catch(e){}
+/* PWA */
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBtn').classList.remove('hide');});
+$('installBtn').onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$('installBtn').classList.add('hide');};
+window.addEventListener('appinstalled',()=>$('installBtn').classList.add('hide'));
 drawDial(); setInterval(()=>loc&&renderSun(),60000); requestAnimationFrame(render);
 })();
 </script>
+<script>
+/* ================= WAKTU SOLAT (JAKIM) ================= */
+(function(){
+const $=id=>document.getElementById(id);
+const TZ='Asia/Kuala_Lumpur', WS='https://api.waktusolat.app', ES='https://www.e-solat.gov.my/index.php?r=esolatApi/TakwimSolat&period=month&zone=';
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const ROWS=[['imsak','Imsak',1],['fajr','Subuh',0],['syuruk','Syuruk',1],['dhuhr','Zohor',0],['asr','Asar',0],['maghrib','Maghrib',0],['isha','Isyak',0]];
+const MAIN=['fajr','dhuhr','asr','maghrib','isha'];
+const LABEL=Object.fromEntries(ROWS.map(r=>[r[0],r[1]]));
+const HM=['Muharam','Safar','Rabiulawal','Rabiulakhir','Jamadilawal','Jamadilakhir','Rejab','Syaaban','Ramadan','Syawal','Zulkaedah','Zulhijah'];
+const FALLBACK={Johor:'JHR01 JHR02 JHR03 JHR04',Kedah:'KDH01 KDH02 KDH03 KDH04 KDH05 KDH06 KDH07',Kelantan:'KTN01 KTN02',Melaka:'MLK01','Negeri Sembilan':'NGS01 NGS02 NGS03',Pahang:'PHG01 PHG02 PHG03 PHG04 PHG05 PHG06 PHG07',Perlis:'PLS01','Pulau Pinang':'PNG01',Perak:'PRK01 PRK02 PRK03 PRK04 PRK05 PRK06 PRK07',Sabah:'SBH01 SBH02 SBH03 SBH04 SBH05 SBH06 SBH07 SBH08 SBH09',Selangor:'SGR01 SGR02 SGR03',Sarawak:'SWK01 SWK02 SWK03 SWK04 SWK05 SWK06 SWK07 SWK08 SWK09',Terengganu:'TRG01 TRG02 TRG03 TRG04','Wilayah Persekutuan':'WLY01 WLY02'};
+
+let cfg=Object.assign({mode:'gps',zone:'',sound:'notif',pre:0,wake:false,bells:{imsak:0,fajr:1,syuruk:0,dhuhr:1,asr:1,maghrib:1,isha:1}},LS.get('ws_cfg',{}));
+const save=()=>LS.set('ws_cfg',cfg);
+let days=LS.get('ws_days',{}); // 'YYYY-MM-DD' -> {hijri, imsak, fajr, ...(ms)}
+let zones=LS.get('ws_zones',null);
+
+const ymd=ms=>new Date(ms+8*3600e3).toISOString().slice(0,10);
+const fmtT=ms=>new Date(ms).toLocaleTimeString('ms-MY',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:TZ}).replace(/\s?(PG|PTG|AM|PM)/i,m=>' '+m.trim().toLowerCase());
+function hijriTxt(h){if(!h)return'';const [y,m,d]=h.split('-').map(Number);return `${d} ${HM[m-1]||''} ${y}H`;}
+function zoneLabel(code){if(!code)return'';const z=(zones||[]).find(x=>x.jakimCode===code);return z?`${code} · ${z.daerah}`:code;}
+function setStatus(t,warn){$('wStatus').innerHTML=t?`<span class="${warn?'warn':''}">${t}</span>`:'';}
+
+/* ---------- data fetching ---------- */
+async function getJSON(url){const r=await fetch(url,{headers:{Accept:'application/json'},cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+function mergeV2(j){
+  (j.prayers||[]).forEach(p=>{if(!p.fajr)return;
+    days[ymd(p.fajr*1000)]={zone:j.zone,hijri:p.hijri,imsak:(p.fajr-600)*1000,fajr:p.fajr*1000,syuruk:p.syuruk*1000,dhuhr:p.dhuhr*1000,asr:p.asr*1000,maghrib:p.maghrib*1000,isha:p.isha*1000};});
+}
+const MON={Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+function mergeES(j,zone){
+  (j.prayerTime||[]).forEach(p=>{const [d,m,y]=p.date.split('-');const key=`${y}-${MON[m]}-${d}`;
+    const t=s=>Date.parse(`${key}T${s.length===5?s+':00':s}+08:00`);
+    days[key]={zone,hijri:p.hijri,imsak:p.imsak?t(p.imsak):t(p.fajr)-600e3,fajr:t(p.fajr),syuruk:t(p.syuruk),dhuhr:t(p.dhuhr),asr:t(p.asr),maghrib:t(p.maghrib),isha:t(p.isha)};});
+}
+function pruneSave(){const cut=ymd(Date.now()-3*864e5);for(const k in days)if(k<cut)delete days[k];LS.set('ws_days',days);LS.set('ws_synced',Date.now());}
+async function loadZone(zone,y,m){
+  const q=(y&&m)?`?year=${y}&month=${m}`:'';
+  try{mergeV2(await getJSON(`${WS}/v2/solat/${zone}${q}`));return 'api.waktusolat.app';}
+  catch(e){ if(q) throw e; mergeES(await getJSON(ES+zone),zone); return 'e-solat.gov.my'; }
+}
+async function zoneFromGPS(){
+  const pos=await new Promise((res,rej)=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>res(p.coords),()=>{const s=LS.get('qiblat_loc',null);s?res({latitude:s.lat,longitude:s.lon}):rej(new Error('GPS gagal'));},{enableHighAccuracy:false,timeout:15000,maximumAge:600000}):rej(new Error('GPS tiada')));
+  const la=pos.latitude.toFixed(5), lo=pos.longitude.toFixed(5);
+  try{const j=await getJSON(`${WS}/v2/solat/gps/${la}/${lo}`);return {zone:j.zone,src:'api.waktusolat.app',j};}
+  catch(e){const z=await getJSON(`${WS}/zones/gps?lat=${la}&long=${lo}`);return {zone:z.zone,src:null};}
+}
+async function sync(force){
+  if(!navigator.onLine&&!force){render();return;}
+  setStatus('Menyegerak dengan JAKIM…');
+  try{
+    let src=null;
+    if(cfg.mode==='gps'){const r=await zoneFromGPS(); if(r.zone!==cfg.zone){ for(const k in days) delete days[k]; } cfg.zone=r.zone; save(); if(r.j){mergeV2(r.j);src=r.src;}}
+    if(!cfg.zone){setStatus('Pilih zon dahulu.',1);return;}
+    if(!src){ for(const k in days) if(days[k].zone!==cfg.zone) delete days[k]; src=await loadZone(cfg.zone); }
+    // pastikan esok ada (hujung bulan)
+    const tmr=ymd(Date.now()+864e5);
+    if(!days[tmr]){const d=new Date(Date.now()+864e5+8*3600e3);try{await loadZone(cfg.zone,d.getUTCFullYear(),d.getUTCMonth()+1);}catch(e){}}
+    pruneSave();
+    $('zInfo').textContent=`Disegerak ${new Date().toLocaleString('ms-MY',{timeZone:TZ})} · sumber ${src}`;
+    setStatus('');
+  }catch(e){
+    setStatus(`Gagal menyegerak (${e.message}). ${Object.keys(days).length?'Memaparkan data tersimpan.':'Pastikan ada internet, atau pilih zon manual.'}`,1);
+  }
+  render(); if(cfg.mode==='man') $('zSel').value=cfg.zone;
+}
+async function loadZones(){
+  try{const z=await getJSON(`${WS}/zones`); if(Array.isArray(z)&&z.length){zones=z;LS.set('ws_zones',z);}}catch(e){}
+  fillZones();
+}
+function fillZones(){
+  const sel=$('zSel'); let h='<option value="">— Pilih zon —</option>';
+  if(zones){const g={};zones.forEach(z=>(g[z.negeri]=g[z.negeri]||[]).push(z));
+    for(const n in g){h+=`<optgroup label="${n}">`+g[n].map(z=>`<option value="${z.jakimCode}">${z.jakimCode} — ${z.daerah}</option>`).join('')+'</optgroup>';}}
+  else for(const n in FALLBACK){h+=`<optgroup label="${n}">`+FALLBACK[n].split(' ').map(c=>`<option value="${c}">${c}</option>`).join('')+'</optgroup>';}
+  sel.innerHTML=h; sel.value=cfg.zone||'';
+}
+
+/* ---------- render ---------- */
+function events(){ // semua waktu hari ini & esok
+  const out=[];[ymd(Date.now()),ymd(Date.now()+864e5)].forEach(k=>{const d=days[k];if(d)ROWS.forEach(([key])=>out.push({key,t:d[key],day:k}));});
+  return out.sort((a,b)=>a.t-b.t);
+}
+function render(){
+  const now=Date.now(), today=days[ymd(now)];
+  $('wZoneTxt').textContent=cfg.zone?`📍 ${zoneLabel(cfg.zone)}${cfg.mode==='gps'?' (ikut lokasi)':''}`:'Zon belum dipilih';
+  $('wDateTxt').textContent=new Date().toLocaleDateString('ms-MY',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:TZ})+(today?` · ${hijriTxt(today.hijri)}`:'');
+  if(!today){$('plist').innerHTML='<div class="prow"><span class="pn small">Tiada data untuk hari ini. Tekan Segerak.</span></div>';$('nextName').textContent='—';$('nextCd').textContent='--:--:--';return;}
+  let cur=null; MAIN.concat('syuruk').forEach(k=>{if(today[k]<=now&&(!cur||today[k]>today[cur]))cur=k;});
+  if(cur==='syuruk')cur=null;
+  $('plist').innerHTML=ROWS.map(([k,n,minor])=>`<div class="prow${minor?' minor':''}${k===cur?' cur':''}"><span class="pn">${n}</span><span class="pt">${fmtT(today[k])}</span><button class="bell${cfg.bells[k]?'':' off'}" data-k="${k}" aria-label="Pemberitahuan ${n}">${cfg.bells[k]?'🔔':'🔕'}</button></div>`).join('');
+  tickNext();
+}
+function tickNext(){
+  const now=Date.now(); const nx=events().find(e=>MAIN.includes(e.key)&&e.t>now);
+  if(!nx){$('nextName').textContent='—';$('nextCd').textContent='--:--:--';$('nextAt').textContent='Segerak untuk data seterusnya';return;}
+  const s=Math.floor((nx.t-now)/1000),p=n=>String(n).padStart(2,'0');
+  $('nextName').textContent=`Menjelang ${LABEL[nx.key]}`;
+  $('nextCd').textContent=`${p(Math.floor(s/3600))}:${p(Math.floor(s/60)%60)}:${p(s%60)}`;
+  $('nextAt').textContent=`${LABEL[nx.key]} pada ${fmtT(nx.t)}${nx.day!==ymd(now)?' (esok)':''}`;
+}
+
+/* ---------- audio ---------- */
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('myqiblat',1);r.onupgradeneeded=()=>r.result.createObjectStore('f');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function idbPut(k,v){const d=await idb();return new Promise((res,rej)=>{const t=d.transaction('f','readwrite');t.objectStore('f').put(v,k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error);});}
+async function idbGet(k){try{const d=await idb();return await new Promise((res,rej)=>{const q=d.transaction('f').objectStore('f').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});}catch(e){return null;}}
+const au=new Audio(); au.preload='auto'; let actx=null, curURL=null;
+function unlock(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume();}catch(e){}}
+document.addEventListener('pointerdown',unlock,{once:false,passive:true});
+function chime(){try{unlock();const t0=actx.currentTime;[[659,0],[523,.55],[784,1.1]].forEach(([f,d])=>{const o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t0+d);g.gain.linearRampToValueAtTime(.35,t0+d+.05);g.gain.exponentialRampToValueAtTime(.001,t0+d+1.4);o.connect(g).connect(actx.destination);o.start(t0+d);o.stop(t0+d+1.5);});}catch(e){}}
+async function playAzan(isSubuh){
+  const f=(isSubuh&&await idbGet('azanS'))||await idbGet('azan');
+  if(!f){chime();return false;}
+  if(curURL)URL.revokeObjectURL(curURL); curURL=URL.createObjectURL(f.blob); au.src=curURL; au.currentTime=0;
+  try{await au.play();return true;}catch(e){chime();return false;}
+}
+function stopAll(){au.pause();au.currentTime=0;$('ovl').classList.add('hide');}
+$('ovlStop').onclick=stopAll;
+
+/* ---------- pemberitahuan ---------- */
+async function notify(title,body,silent,tag){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  const opt={body,icon:'icon-192.png',badge:'icon-192.png',tag,renotify:true,silent,vibrate:[400,150,400,150,400],requireInteraction:false};
+  try{const reg=await navigator.serviceWorker.ready;await reg.showNotification(title,opt);}catch(e){try{new Notification(title,opt);}catch(_){}}
+}
+function fire(ev){
+  const n=LABEL[ev.key], zone=zoneLabel(cfg.zone);
+  if(ev.pre){notify(`${n} dalam ${cfg.pre} minit`,`${n} pada ${fmtT(ev.t)} · ${zone}`,cfg.sound!=='notif',`pre-${ev.key}`); if(document.visibilityState==='visible'&&cfg.sound!=='vib')chime(); return;}
+  const isMain=MAIN.includes(ev.key);
+  const title=isMain?`Telah masuk waktu ${n}`:(ev.key==='imsak'?'Waktu Imsak':'Syuruk — tamat waktu Subuh');
+  notify(title,`${fmtT(ev.t)} · ${zone}`,cfg.sound!=='notif',`w-${ev.key}`);
+  if(navigator.vibrate)navigator.vibrate([400,150,400,150,400]);
+  if(cfg.sound==='azan'&&isMain) playAzan(ev.key==='fajr');
+  else if(cfg.sound==='chime'||(cfg.sound==='azan'&&!isMain)) chime();
+  if(document.visibilityState==='visible'){$('ovlSub').textContent=isMain?'Telah masuk waktu':'Peringatan';$('ovlName').textContent=n;$('ovlZone').textContent=`${fmtT(ev.t)} · ${zone}`;$('ovl').classList.remove('hide');
+    if(!(cfg.sound==='azan'&&isMain))setTimeout(()=>$('ovl').classList.add('hide'),20000);}
+}
+au.onended=()=>$('ovl').classList.add('hide');
+let fired=new Set(LS.get('ws_fired',[]));
+function checkAlerts(){
+  const now=Date.now(); let changed=false;
+  events().forEach(e=>{
+    const list=[];
+    if(cfg.bells[e.key]) list.push({...e,id:`${e.key}@${e.t}`});
+    if(cfg.bells[e.key]&&cfg.pre>0&&MAIN.includes(e.key)) list.push({...e,pre:1,t:e.t-cfg.pre*60e3,real:e.t,id:`pre-${e.key}@${e.t}`});
+    list.forEach(x=>{ if(x.t<=now&&now-x.t<180000&&!fired.has(x.id)){fired.add(x.id);changed=true;fire(x.pre?{...x,t:x.real}:x);} });
+  });
+  if(changed){fired=new Set([...fired].slice(-60));LS.set('ws_fired',[...fired]);}
+}
+
+/* ---------- wake lock ---------- */
+let wl=null;
+async function applyWake(){try{if(cfg.wake&&document.visibilityState==='visible'&&'wakeLock' in navigator){if(!wl){wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>wl=null);}}else if(wl){await wl.release();wl=null;}}catch(e){}}
+
+/* ---------- UI ---------- */
+function showTab(w){$('tabQ').classList.toggle('hide',w);$('tabW').classList.toggle('hide',!w);$('tQ').classList.toggle('on',!w);$('tW').classList.toggle('on',w);LS.set('ws_tab',w?1:0);if(w)render();window.scrollTo(0,0);}
+$('tQ').onclick=()=>showTab(false); $('tW').onclick=()=>showTab(true);
+function setMode(m){cfg.mode=m;save();$('zGps').classList.toggle('on',m==='gps');$('zMan').classList.toggle('on',m==='man');$('zManBox').classList.toggle('hide',m!=='man');}
+$('zGps').onclick=()=>{setMode('gps');sync(true);};
+$('zMan').onclick=()=>{setMode('man');if(!zones)loadZones();};
+$('zSel').onchange=()=>{const z=$('zSel').value;if(!z)return;if(z!==cfg.zone){for(const k in days)delete days[k];}cfg.zone=z;save();sync(true);};
+$('zSync').onclick=()=>sync(true);
+$('plist').onclick=e=>{const b=e.target.closest('.bell');if(!b)return;const k=b.dataset.k;cfg.bells[k]=cfg.bells[k]?0:1;save();render();if(cfg.bells[k]&&'Notification' in window&&Notification.permission==='default')Notification.requestPermission();};
+$('sMode').value=cfg.sound; $('sPre').value=String(cfg.pre); $('sWake').checked=!!cfg.wake;
+const showAz=()=>$('azanBox').classList.toggle('hide',cfg.sound!=='azan');
+$('sMode').onchange=()=>{cfg.sound=$('sMode').value;save();showAz();};
+$('sPre').onchange=()=>{cfg.pre=+$('sPre').value;save();};
+$('sWake').onchange=()=>{cfg.wake=$('sWake').checked;save();applyWake();};
+async function pickFile(inp,key,lbl){const f=inp.files[0];if(!f)return;try{await idbPut(key,{name:f.name,blob:f});$(lbl).textContent=f.name;}catch(e){$(lbl).textContent='gagal simpan';}}
+$('azanFile').onchange=()=>pickFile($('azanFile'),'azan','azanName');
+$('azanSFile').onchange=()=>pickFile($('azanSFile'),'azanS','azanSName');
+(async()=>{const a=await idbGet('azan'),s=await idbGet('azanS');if(a)$('azanName').textContent=a.name;if(s)$('azanSName').textContent=s.name;})();
+function permTxt(){const p=('Notification' in window)?Notification.permission:'unsupported';$('sPerm').textContent=p==='granted'?'✅ Notifikasi dibenarkan':p==='denied'?'⛔ Notifikasi disekat':p==='unsupported'?'Notifikasi tidak disokong':'Benarkan notifikasi';}
+$('sPerm').onclick=async()=>{if('Notification' in window&&Notification.permission==='default')await Notification.requestPermission();permTxt();if(Notification.permission==='denied')setStatus('Notifikasi disekat. Buka tetapan Chrome → Tetapan tapak → Pemberitahuan untuk membenarkan.',1);};
+$('sTest').onclick=async()=>{unlock();if('Notification' in window&&Notification.permission==='default'){await Notification.requestPermission();permTxt();}
+  if(!$('ovl').classList.contains('hide')){stopAll();return;}
+  fire({key:'dhuhr',t:Date.now()});};
+
+/* ---------- start ---------- */
+setMode(cfg.mode); showAz(); permTxt(); if(zones)fillZones(); else loadZones();
+if(LS.get('ws_tab',0))showTab(true);
+render();
+const stale=Date.now()-LS.get('ws_synced',0)>3*864e5;
+if(cfg.zone&&!days[ymd(Date.now()+864e5)]||stale) sync(false); else if(!cfg.zone&&cfg.mode==='gps'&&LS.get('ws_tab',0)) sync(false);
+let lastDay=ymd(Date.now());
+setInterval(()=>{checkAlerts();tickNext();const d=ymd(Date.now());if(d!==lastDay){lastDay=d;render();if(!days[ymd(Date.now()+864e5)])sync(false);}},1000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){checkAlerts();render();}applyWake();});
+applyWake();
+})();
+</script>
+
 </body>
 </html>
