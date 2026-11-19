@@ -215,10 +215,15 @@ nav.tabs button i{font-size:1.25rem}
       <option value="vib">Getar sahaja</option>
     </select>
     <div id="azanBox">
+      <label>Sumber azan</label>
+      <div class="seg"><button id="srcApp">Azan myQiblat</button><button id="srcOwn">Fail sendiri</button></div>
+      <div class="note" id="azAppNote"></div>
+      <div id="ownBox">
       <label>Fail azan (MP3/M4A) — <span id="azanName">belum dipilih</span></label>
       <input type="file" id="azanFile" accept="audio/*">
       <label>Fail azan Subuh (pilihan) — <span id="azanSName">guna azan biasa</span></label>
       <input type="file" id="azanSFile" accept="audio/*">
+      </div>
     </div>
     <label>Peringatan awal</label>
     <select id="sPre"><option value="0">Tiada</option><option value="5">5 minit sebelum</option><option value="10">10 minit sebelum</option><option value="15">15 minit sebelum</option></select>
@@ -565,7 +570,7 @@ const LABEL=Object.fromEntries(ROWS.map(r=>[r[0],r[1]]));
 const HM=['Muharam','Safar','Rabiulawal','Rabiulakhir','Jamadilawal','Jamadilakhir','Rejab','Syaaban','Ramadan','Syawal','Zulkaedah','Zulhijah'];
 const FALLBACK={Johor:'JHR01 JHR02 JHR03 JHR04',Kedah:'KDH01 KDH02 KDH03 KDH04 KDH05 KDH06 KDH07',Kelantan:'KTN01 KTN02',Melaka:'MLK01','Negeri Sembilan':'NGS01 NGS02 NGS03',Pahang:'PHG01 PHG02 PHG03 PHG04 PHG05 PHG06 PHG07',Perlis:'PLS01','Pulau Pinang':'PNG01',Perak:'PRK01 PRK02 PRK03 PRK04 PRK05 PRK06 PRK07',Sabah:'SBH01 SBH02 SBH03 SBH04 SBH05 SBH06 SBH07 SBH08 SBH09',Selangor:'SGR01 SGR02 SGR03',Sarawak:'SWK01 SWK02 SWK03 SWK04 SWK05 SWK06 SWK07 SWK08 SWK09',Terengganu:'TRG01 TRG02 TRG03 TRG04','Wilayah Persekutuan':'WLY01 WLY02'};
 
-let cfg=Object.assign({mode:'gps',zone:'',sound:'notif',pre:0,wake:false,bells:{imsak:0,fajr:1,syuruk:0,dhuhr:1,asr:1,maghrib:1,isha:1}},LS.get('ws_cfg',{}));
+let cfg=Object.assign({mode:'gps',zone:'',sound:'notif',azanSrc:'app',pre:0,wake:false,bells:{imsak:0,fajr:1,syuruk:0,dhuhr:1,asr:1,maghrib:1,isha:1}},LS.get('ws_cfg',{}));
 const save=()=>LS.set('ws_cfg',cfg);
 let days=LS.get('ws_days',{}); // 'YYYY-MM-DD' -> {hijri, imsak, fajr, ...(ms)}
 let zones=LS.get('ws_zones',null);
@@ -672,10 +677,29 @@ const au=new Audio(); au.preload='auto'; let actx=null, curURL=null;
 function unlock(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume();}catch(e){}}
 document.addEventListener('pointerdown',unlock,{once:false,passive:true});
 function chime(){try{unlock();const t0=actx.currentTime;[[659,0],[523,.55],[784,1.1]].forEach(([f,d])=>{const o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t0+d);g.gain.linearRampToValueAtTime(.35,t0+d+.05);g.gain.exponentialRampToValueAtTime(.001,t0+d+1.4);o.connect(g).connect(actx.destination);o.start(t0+d);o.stop(t0+d+1.5);});}catch(e){}}
+/* azan myQiblat dari repo, disimpan dalam cache untuk luar talian */
+const AZ_CACHE='myqiblat-audio-v1', AZ={n:'azan.mp3',s:'azan-subuh.mp3'};
+async function azCached(name){try{const c=await caches.open(AZ_CACHE);const r=await c.match(name);return r?await r.blob():null;}catch(e){return null;}}
+async function azPrefetch(){
+  if(!('caches' in window))return;
+  let ok=0;
+  for(const n of [AZ.n,AZ.s]){
+    if(await azCached(n)){ok++;continue;}
+    if(!navigator.onLine)continue;
+    try{azNote('⏳ Memuat turun '+n+'…');const r=await fetch(n,{cache:'no-store'});if(!r.ok)throw 0;const c=await caches.open(AZ_CACHE);await c.put(n,r);ok++;}catch(e){}
+  }
+  azNote(ok===2?'✅ Azan myQiblat (biasa &amp; Subuh) tersimpan dalam telefon — boleh berbunyi tanpa internet.':'⚠️ Azan belum lengkap disimpan. Buka app sekali ketika ada internet.');
+}
+function azNote(t){const e=$('azAppNote');if(e)e.innerHTML=t;}
 async function playAzan(isSubuh){
-  const f=(isSubuh&&await idbGet('azanS'))||await idbGet('azan');
-  if(!f){chime();return false;}
-  if(curURL)URL.revokeObjectURL(curURL); curURL=URL.createObjectURL(f.blob); au.src=curURL; au.currentTime=0;
+  let blob=null;
+  if(cfg.azanSrc==='own'){const f=(isSubuh&&await idbGet('azanS'))||await idbGet('azan');blob=f&&f.blob;}
+  else{blob=(isSubuh&&await azCached(AZ.s))||await azCached(AZ.n);}
+  if(curURL){URL.revokeObjectURL(curURL);curURL=null;}
+  if(blob){curURL=URL.createObjectURL(blob);au.src=curURL;}
+  else if(cfg.azanSrc!=='own'&&navigator.onLine){au.src=isSubuh?AZ.s:AZ.n;}
+  else{chime();return false;}
+  au.currentTime=0;
   try{await au.play();return true;}catch(e){chime();return false;}
 }
 function stopAll(){au.pause();au.currentTime=0;$('ovl').classList.add('hide');}
@@ -728,7 +752,9 @@ $('zSel').onchange=()=>{const z=$('zSel').value;if(!z)return;if(z!==cfg.zone){fo
 $('zSync').onclick=()=>sync(true);
 $('plist').onclick=e=>{const b=e.target.closest('.bell');if(!b)return;const k=b.dataset.k;cfg.bells[k]=cfg.bells[k]?0:1;save();render();if(cfg.bells[k]&&'Notification' in window&&Notification.permission==='default')Notification.requestPermission();};
 $('sMode').value=cfg.sound; $('sPre').value=String(cfg.pre); $('sWake').checked=!!cfg.wake;
-const showAz=()=>$('azanBox').classList.toggle('hide',cfg.sound!=='azan');
+const showAz=()=>{$('azanBox').classList.toggle('hide',cfg.sound!=='azan');$('srcApp').classList.toggle('on',cfg.azanSrc!=='own');$('srcOwn').classList.toggle('on',cfg.azanSrc==='own');$('ownBox').classList.toggle('hide',cfg.azanSrc!=='own');$('azAppNote').classList.toggle('hide',cfg.azanSrc==='own');};
+$('srcApp').onclick=()=>{cfg.azanSrc='app';save();showAz();azPrefetch();};
+$('srcOwn').onclick=()=>{cfg.azanSrc='own';save();showAz();};
 $('sMode').onchange=()=>{cfg.sound=$('sMode').value;save();showAz();};
 $('sPre').onchange=()=>{cfg.pre=+$('sPre').value;save();};
 $('sWake').onchange=()=>{cfg.wake=$('sWake').checked;save();applyWake();};
@@ -798,7 +824,7 @@ window.addEventListener('myq-loc',async e=>{
 window.MYQ={days:()=>days,ymd,fmtT,LABEL,toast};
 
 /* ---------- start ---------- */
-setMode(cfg.mode); showAz(); permTxt(); if(zones)fillZones(); else loadZones();
+setMode(cfg.mode); showAz(); setTimeout(azPrefetch,4000); permTxt(); if(zones)fillZones(); else loadZones();
 {const t=LS.get('ws_tab',0);if(t)setTimeout(()=>showTab(t),0);}
 render();
 const stale=Date.now()-LS.get('ws_synced',0)>3*864e5;
