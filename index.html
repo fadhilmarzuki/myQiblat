@@ -71,6 +71,9 @@ nav.tabs button{font-size:.7rem;padding:8px 0 10px}
 nav.tabs button i{font-size:1.25rem}
 .mfBanner{display:block;background:linear-gradient(135deg,#7a5a12,#4d3a0c);border:1px solid var(--gold);border-radius:12px;padding:10px 12px;margin-top:10px;font-size:.85rem;line-height:1.45;color:var(--txt);text-align:left;width:100%}
 .mfBanner b{color:var(--gold)}
+.mfBanner.hide{display:none}
+.fsBtn{position:absolute;right:0;top:2px;background:var(--card);border:1px solid #ffffff33;color:var(--txt);border-radius:10px;padding:6px 10px;font-size:.8rem;font-weight:600}
+@media (display-mode: fullscreen),(display-mode: standalone){.fsBtn{display:none}}
 .qw{background:var(--card);border-radius:14px;padding:10px 12px;margin-top:10px;border:1px solid #e8c46833;cursor:pointer}
 .qw .top{display:flex;justify-content:space-between;align-items:baseline}
 .qw .nm{color:var(--gold);font-weight:700;font-size:.9rem}
@@ -121,7 +124,8 @@ nav.tabs button i{font-size:1.25rem}
 </style>
 </head>
 <body>
-<h1><img src="icon-192.png" alt="" style="width:30px;height:30px;border-radius:8px;vertical-align:-7px;margin-right:6px">myQiblat</h1>
+<div style="position:relative"><button class="fsBtn" id="fsBtn">⛶ Penuh</button>
+<h1><img src="icon-192.png" alt="" style="width:30px;height:30px;border-radius:8px;vertical-align:-7px;margin-right:6px">myQiblat</h1></div>
 
 <section id="tabQ">
 <button class="mfBanner hide" id="bannerQ"></button>
@@ -307,7 +311,7 @@ nav.tabs button i{font-size:1.25rem}
     <div id="kChips"></div>
   </div>
   <div id="kList"></div>
-  <div class="card small">Data daripada OpenStreetMap (sumbangan komuniti) — sesetengah masjid/surau mungkin tiada atau tiada nama. Jarak ialah garis lurus; tekan Waze/Maps untuk laluan sebenar.</div>
+  <div class="card small">Data daripada OpenStreetMap (sumbangan komuniti) — sesetengah masjid/surau mungkin tiada atau tiada nama. Jarak ialah garis lurus; tekan Google Maps untuk laluan sebenar.</div>
 </section>
 
 <section id="tabT" class="hide">
@@ -324,7 +328,7 @@ nav.tabs button i{font-size:1.25rem}
       <div class="small" id="tInfo" style="margin-top:8px"></div>
       <div class="row" style="width:100%;max-width:240px"><select id="tTarget"><option value="33">Sasaran 33</option><option value="99">Sasaran 99</option><option value="100">Sasaran 100</option><option value="1000">Sasaran 1000</option><option value="0">Tanpa had</option></select></div>
       <div class="row" style="width:100%;max-width:240px"><button class="btn sec" id="tUndo">↶ Tolak 1</button><button class="btn sec" id="tReset">⟲ Set semula</button></div>
-      <div class="small" style="margin-top:10px;max-width:220px">Sapu bijik tasbih <b>ke bawah</b> dengan ibu jari kiri atau kanan. Boleh juga ketik nombor.</div>
+      <div class="small" style="margin-top:10px;max-width:220px">Sapu bijik tasbih <b>ke bawah</b> atau sentuh bijik dengan ibu jari kiri/kanan — setiap sentuhan = satu kiraan. Boleh juga ketik nombor.</div>
     </div>
     <div class="strip r" id="stripR"><svg id="svgR"></svg></div>
   </div>
@@ -542,6 +546,12 @@ $('installBtn').onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.promp
 window.addEventListener('appinstalled',()=>$('installBtn').classList.add('hide'));
 drawDial(); setInterval(()=>loc&&renderSun(),60000); requestAnimationFrame(render);
 })();
+
+/* skrin penuh (dalam pelayar) */
+(function(){const b=document.getElementById('fsBtn');if(!b)return;
+  if(!document.documentElement.requestFullscreen){b.style.display='none';return;}
+  b.onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{});};
+  document.addEventListener('fullscreenchange',()=>b.textContent=document.fullscreenElement?'✕ Keluar':'⛶ Penuh');})();
 </script>
 <script>
 /* ================= WAKTU SOLAT (JAKIM) ================= */
@@ -972,7 +982,7 @@ function show(){
   if(!L.length){$('kList').innerHTML=`<div class="card small">Tiada ditemui dalam ${rad/1000} km. Cuba besarkan jejari.</div>`;return;}
   $('kList').innerHTML=L.slice(0,60).map(x=>`<div class="mq"><div class="t"><b>${x.type==='Surau'?'🕌':'🕌'} ${esc(x.name)}</b><span class="d">${x.d<1?Math.round(x.d*1000)+' m':x.d.toFixed(1)+' km'}</span></div>
     <div class="a">${x.type!=='Lain'?x.type+' · ':''}arah ${DIR[Math.round(x.b/45)%8]} (${Math.round(x.b)}°)${x.addr?' · '+esc(x.addr):''}</div>
-    <div class="l"><a href="https://waze.com/ul?ll=${x.lat},${x.lon}&navigate=yes" target="_blank" rel="noopener">🚗 Waze</a><a href="https://www.google.com/maps/dir/?api=1&destination=${x.lat},${x.lon}" target="_blank" rel="noopener">🗺️ Google Maps</a></div></div>`).join('');
+    <div class="l"><a href="https://www.google.com/maps/dir/?api=1&destination=${x.lat},${x.lon}" target="_blank" rel="noopener">🗺️ Google Maps</a></div></div>`).join('');
 }
 $('kFind').onclick=async()=>{$('kLoc').textContent='Mendapatkan lokasi…';try{here=await pos();$('kLoc').textContent=`📍 ${here.lat.toFixed(4)}, ${here.lon.toFixed(4)}`;query();}catch(e){$('kLoc').innerHTML=`<span class="warn">GPS gagal: ${esc(e.message)}</span>`;}};
 setRad(rad);
@@ -1049,13 +1059,17 @@ function beads(svg,side){
   svg.innerHTML=s;
 }
 function draw(){if($('tabT').classList.contains('hide'))return;beads($('svgL'),'L');beads($('svgR'),'R');}
-function animateTo(target,done){cancelAnimationFrame(anim);const from=off,t0=performance.now(),D=130;
-  const step=t=>{const k=Math.min(1,(t-t0)/D);off=from+(target-from)*(1-Math.pow(1-k,3));draw();if(k<1)anim=requestAnimationFrame(step);else{off=0;if(done)done();draw();}};anim=requestAnimationFrame(step);}
+let pending=null;
+function finishAnim(){if(anim){cancelAnimationFrame(anim);anim=null;off=0;const d=pending;pending=null;if(d)d();draw();}}
+function animateTo(target,done){finishAnim();pending=done||null;const from=off,t0=performance.now(),D=140;
+  const step=t=>{const k=Math.min(1,(t-t0)/D);off=from+(target-from)*(1-Math.pow(1-k,3));draw();if(k<1)anim=requestAnimationFrame(step);else{anim=null;off=0;const d=pending;pending=null;if(d)d();draw();}};anim=requestAnimationFrame(step);}
 ['stripL','stripR'].forEach(id=>{
   const el=$(id); let drag=null;
-  el.addEventListener('pointerdown',e=>{cancelAnimationFrame(anim);drag={y:e.clientY,id:e.pointerId};try{el.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();});
-  el.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;const dy=e.clientY-drag.y;drag.y=e.clientY;off=Math.max(0,off+dy);while(off>=SP){off-=SP;inc();}draw();e.preventDefault();});
-  const up=e=>{if(!drag)return;drag=null;if(off>SP*0.45)animateTo(SP,()=>inc());else animateTo(0);};
+  // satu sentuhan = satu bijik sahaja
+  el.addEventListener('pointerdown',e=>{if(drag)return;finishAnim();drag={y:e.clientY,id:e.pointerId,done:false};try{el.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();});
+  el.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id||drag.done)return;const dy=e.clientY-drag.y;drag.y=e.clientY;off=Math.max(0,Math.min(SP,off+dy));
+    if(off>=SP*0.4){drag.done=true;animateTo(SP,()=>inc());}else draw();e.preventDefault();});
+  const up=e=>{if(!drag||(e&&e.pointerId!==drag.id))return;const d=drag;drag=null;if(!d.done&&e.type==='pointerup')animateTo(SP,()=>inc());else if(!d.done)animateTo(0);};
   el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
 });
 window.addEventListener('resize',draw);
