@@ -13,6 +13,8 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="myQiblat">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap">
 <style>
 :root{--bg:#0b3d2e;--bg2:#0f4f3c;--card:#135943;--gold:#e8c468;--txt:#f3f1e8;--mut:#b7cfc4;--ok:#3ddc84;--warn:#ffb347}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -72,6 +74,21 @@ nav.tabs button i{font-size:1.25rem}
 .mfBanner{display:block;background:linear-gradient(135deg,#7a5a12,#4d3a0c);border:1px solid var(--gold);border-radius:12px;padding:10px 12px;margin-top:10px;font-size:.85rem;line-height:1.45;color:var(--txt);text-align:left;width:100%}
 .mfBanner b{color:var(--gold)}
 .mfBanner.hide{display:none}
+.dcard{display:block;width:100%;text-align:left;background:var(--card);border:1px solid #ffffff1f;border-radius:14px;padding:14px;margin-top:10px;color:var(--txt)}
+.dcard b{display:block;font-size:1rem;color:var(--gold)}
+.dcard span{font-size:.8rem;color:var(--mut)}
+.dtools{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.dtools button{background:var(--card);border:1px solid #ffffff33;color:var(--txt);border-radius:10px;padding:8px 12px;font-weight:700;font-size:.85rem}
+.dtools label{display:flex;align-items:center;gap:6px;margin:0;font-size:.82rem;color:var(--txt)}
+.arb{font-family:"Scheherazade New","Amiri","Noto Naskh Arabic",serif;direction:rtl;text-align:justify;text-align-last:right;font-size:var(--ars,30px);line-height:2.05;color:#fffbea;background:#08291f;border:1px solid #e8c46833;border-radius:14px;padding:14px 16px;margin-top:12px}
+.arb p{margin:0 0 .35em}
+.arb .rep{display:inline-block;direction:ltr;font-family:system-ui,sans-serif;font-size:.8rem;background:var(--gold);color:#1d1a0c;border-radius:999px;padding:1px 8px;margin:0 6px;vertical-align:middle;font-weight:700}
+.arb .inst{direction:ltr;text-align:left;font-family:system-ui,sans-serif;font-size:.85rem;color:var(--mut);font-style:italic;margin:.4em 0 .6em;line-height:1.5}
+.trb{background:var(--card);border-radius:14px;padding:12px 14px;margin-top:12px;font-size:.92rem;line-height:1.65;text-align:justify}
+.trb h4{color:var(--gold);font-size:.9rem;margin-bottom:6px}
+.trb p{margin:0 0 .7em}
+.trb .inst{color:var(--mut);font-style:italic;font-size:.85rem}
+
 .fsBtn{position:absolute;right:0;top:2px;background:var(--card);border:1px solid #ffffff33;color:var(--txt);border-radius:10px;padding:6px 10px;font-size:.8rem;font-weight:600}
 @media (display-mode: fullscreen),(display-mode: standalone){.fsBtn{display:none}}
 .qw{background:var(--card);border-radius:14px;padding:10px 12px;margin-top:10px;border:1px solid #e8c46833;cursor:pointer}
@@ -339,7 +356,24 @@ nav.tabs button i{font-size:1.25rem}
   </div>
 </section>
 
-<nav class="tabs"><button id="tQ" class="on"><i>🧭</i>Qiblat</button><button id="tW"><i>🕰️</i>Solat</button><button id="tM"><i>🧳</i>Musafir</button><button id="tK"><i>🕌</i>Masjid</button><button id="tT"><i>📿</i>Tasbih</button></nav>
+<section id="tabD" class="hide">
+  <div id="dList">
+    <h2 style="text-align:center;font-size:1.05rem;margin-top:10px">🤲 Koleksi Doa</h2>
+    <div id="dCards"></div>
+    <div class="card small">Teks Arab hendaklah sentiasa disemak dengan sumber bercetak. Jika terdapat perbezaan dengan amalan masjid setempat, ikutlah bimbingan imam/guru anda.</div>
+  </div>
+  <div id="dView" class="hide">
+    <button class="btn sec" id="dBack" style="margin-top:6px">← Senarai doa</button>
+    <h2 id="dTitle" style="text-align:center;font-size:1.1rem;margin-top:12px;color:var(--gold)"></h2>
+    <div class="sub" id="dSub"></div>
+    <div class="dtools"><button id="dMinus" aria-label="Kecilkan tulisan">A−</button><button id="dPlus" aria-label="Besarkan tulisan">A+</button><label><input type="checkbox" id="dTrOn" style="width:auto;margin:0"> Tunjuk terjemahan</label></div>
+    <div class="arb" id="dAr"></div>
+    <div class="trb" id="dTr"></div>
+    <div class="note" id="dSrc" style="margin-top:10px"></div>
+  </div>
+</section>
+
+<nav class="tabs"><button id="tQ" class="on"><i>🧭</i>Qiblat</button><button id="tW"><i>🕰️</i>Solat</button><button id="tM"><i>🧳</i>Musafir</button><button id="tK"><i>🕌</i>Masjid</button><button id="tT"><i>📿</i>Tasbih</button><button id="tD"><i>🤲</i>Doa</button></nav>
 <div class="modal hide" id="mon">
   <div class="row" style="align-items:center"><button class="btn sec" id="monPrev" style="flex:0 0 52px;margin:0;padding:10px">◀</button><div style="text-align:center"><b id="monTitle">—</b><div class="small" id="monZone"></div></div><button class="btn sec" id="monNext" style="flex:0 0 52px;margin:0;padding:10px">▶</button></div>
   <div id="monBody"></div>
@@ -741,9 +775,9 @@ let wl=null;
 async function applyWake(){try{if(cfg.wake&&document.visibilityState==='visible'&&'wakeLock' in navigator){if(!wl){wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>wl=null);}}else if(wl){await wl.release();wl=null;}}catch(e){}}
 
 /* ---------- UI ---------- */
-function showTab(w){w=+w||0;['tabQ','tabW','tabM','tabK','tabT'].forEach((id,i)=>$(id).classList.toggle('hide',i!==w));['tQ','tW','tM','tK','tT'].forEach((id,i)=>$(id).classList.toggle('on',i===w));LS.set('ws_tab',w);if(w===1)render();if(w===2&&window.renderMusafir)renderMusafir();if(w===4&&window.renderTasbih)renderTasbih();window.scrollTo(0,0);}
+function showTab(w){w=+w||0;['tabQ','tabW','tabM','tabK','tabT','tabD'].forEach((id,i)=>$(id).classList.toggle('hide',i!==w));['tQ','tW','tM','tK','tT','tD'].forEach((id,i)=>$(id).classList.toggle('on',i===w));LS.set('ws_tab',w);if(w===1)render();if(w===2&&window.renderMusafir)renderMusafir();if(w===4&&window.renderTasbih)renderTasbih();window.scrollTo(0,0);}
 window.showTab=showTab;
-['tQ','tW','tM','tK','tT'].forEach((id,i)=>$(id).onclick=()=>showTab(i));
+['tQ','tW','tM','tK','tT','tD'].forEach((id,i)=>$(id).onclick=()=>showTab(i));
 $('qw').onclick=()=>showTab(1);
 function setMode(m){cfg.mode=m;save();$('zGps').classList.toggle('on',m==='gps');$('zMan').classList.toggle('on',m==='man');$('zManBox').classList.toggle('hide',m!=='man');}
 $('zGps').onclick=()=>{setMode('gps');sync(true);};
@@ -1103,6 +1137,88 @@ window.renderTasbih=()=>{ui();requestAnimationFrame(draw);};
 ui();
 })();
 </script>
+<script>
+/* ================= KOLEKSI DOA ================= */
+(function(){
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+/* ar: rentetan teks Arab, atau {t:teks, x:'3×'} untuk ulangan, atau {i:'arahan'} */
+const DOA=[
+{id:'solat',title:'Doa Selepas Solat',sub:'Doa lazim selepas solat fardu',
+ src:'Teks Arab mengikut teks rujukan yang diberikan oleh pemilik app. Terjemahan Bahasa Melayu disediakan untuk myQiblat.',
+ ar:[
+  'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ',
+  'اَلْحَمْدُ لِلّٰهِ رَبِّ الْعَالَمِيْنَ، وَالصَّلَاةُ وَالسَّلَامُ عَلٰى سَيِّدِ الْمُرْسَلِيْنَ وَإِمَامِ الْمُتَّقِيْنَ، وَعَلٰى آلِهِ وَأَهْلِ بَيْتِهِ وَصَحْبِهِ أَجْمَعِيْنَ.',
+  'اَللّٰهُمَّ إِنَّا نَسْأَلُكَ سَلَامَةً فِي الدِّيْنِ، وَعَافِيَةً فِي الْجَسَدِ، وَزِيَادَةً فِي الْعِلْمِ، وَبَرَكَةً فِي الرِّزْقِ، وَتَوْبَةً قَبْلَ الْمَوْتِ، وَرَحْمَةً عِنْدَ الْمَوْتِ، وَمَغْفِرَةً بَعْدَ الْمَوْتِ.',
+  'اَللّٰهُمَّ هَوِّنْ عَلَيْنَا فِيْ سَكَرَاتِ الْمَوْتِ، وَالنَّجَاةَ مِنَ النَّارِ، وَالْعَفْوَ عِنْدَ الْحِسَابِ.',
+  'رَبَّنَا لَا تُزِغْ قُلُوْبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَدُنْكَ رَحْمَةً، إِنَّكَ أَنْتَ الْوَهَّابُ.',
+  'اَللّٰهُمَّ أَحْيِنَا بِالْإِيْمَانِ، وَأَمِتْنَا بِالْإِيْمَانِ، وَأَدْخِلْنَا الْجَنَّةَ مَعَ الْإِيْمَانِ.',
+  'اَللّٰهُمَّ اغْفِرْ لَنَا ذُنُوْبَنَا وَلِوَالِدِيْنَا وَارْحَمْهُمَا كَمَا رَبَّيَانَا صَغِيْرًا.',
+  'اَللّٰهُمَّ اخْتِمْ لَنَا بِحُسْنِ الْخَاتِمَةِ، وَلَا تَخْتِمْ عَلَيْنَا بِسُوْءِ الْخَاتِمَةِ.',
+  'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً، وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ.',
+  'وَصَلَّى اللّٰهُ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِهِ وَصَحْبِهِ وَسَلَّمَ، وَالْحَمْدُ لِلّٰهِ رَبِّ الْعَالَمِيْنَ.'
+ ],
+ tr:[
+  'Dengan nama Allah Yang Maha Pemurah lagi Maha Penyayang.',
+  'Segala puji bagi Allah, Tuhan sekalian alam. Selawat dan salam ke atas penghulu para rasul dan imam orang-orang yang bertakwa, serta ke atas keluarganya, ahli rumahnya dan seluruh sahabatnya.',
+  'Ya Allah, kami memohon kepada-Mu keselamatan dalam agama, kesihatan tubuh badan, tambahan ilmu, keberkatan rezeki, taubat sebelum mati, rahmat ketika mati dan keampunan selepas mati.',
+  'Ya Allah, permudahkanlah kami ketika sakaratul maut, dan kurniakanlah kami keselamatan daripada neraka serta kemaafan ketika dihisab.',
+  'Wahai Tuhan kami, janganlah Engkau pesongkan hati kami setelah Engkau beri petunjuk kepada kami, dan kurniakanlah kami rahmat daripada sisi-Mu. Sesungguhnya Engkaulah Maha Pemberi.',
+  'Ya Allah, hidupkanlah kami dengan iman, matikanlah kami dengan iman, dan masukkanlah kami ke dalam syurga bersama iman.',
+  'Ya Allah, ampunilah dosa-dosa kami dan dosa kedua ibu bapa kami, dan kasihanilah mereka berdua sebagaimana mereka memelihara kami semasa kecil.',
+  'Ya Allah, akhirilah hidup kami dengan pengakhiran yang baik (husnul khatimah), dan janganlah Engkau akhiri hidup kami dengan pengakhiran yang buruk (su\u2019ul khatimah).',
+  'Wahai Tuhan kami, berilah kami kebaikan di dunia dan kebaikan di akhirat, dan peliharalah kami daripada azab neraka.',
+  'Semoga Allah melimpahkan selawat dan salam ke atas penghulu kami Muhammad, keluarga dan sahabatnya. Segala puji bagi Allah, Tuhan sekalian alam.'
+ ]},
+{id:'yasin',title:'Doa Selepas Yasin',sub:'Dibaca selepas tamat bacaan Surah Yasin',
+ src:'Teks Arab: dokumen "Doa Selepas Yasin" (TheMizzone.com). Terjemahan Bahasa Melayu disediakan untuk myQiblat.',
+ ar:[
+  'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ',
+  'اَلْحَمْدُ لِلّٰهِ رَبِّ الْعٰلَمِيْنَ، حَمْدًا يُوَافِيْ نِعَمَهُ وَيُكَافِئُ مَزِيْدَهُ، يَا رَبَّنَا لَكَ الْحَمْدُ كَمَا يَنْبَغِيْ لِجَلَالِ وَجْهِكَ وَعَظِيْمِ سُلْطَانِكَ. اَللّٰهُمَّ صَلِّ وَسَلِّمْ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِهِ وَصَحْبِهِ أَجْمَعِيْنَ.',
+  'اَللّٰهُمَّ بِحَقِّ يٰسٓ، وَالْقُرْآنِ الْحَكِيْمِ، وَبِمَنِ اخْتَرْتَهُ بِالرِّسَالَةِ وَالنُّبُوَّةِ وَالْوِلَايَةِ وَالْهِدَايَةِ إِلٰى صِرَاطِكَ الْمُسْتَقِيْمِ، وَبِجَمِيْعِ مَا جَاءَ بِهِ مِنْكَ جِبْرِيْلُ، تَنْزِيْلَ الْعَزِيْزِ الرَّحِيْمِ.',
+  'وَبِخَوَاصِّ الْحُرُوْفِ وَالْأَسْمَاءِ التَّامَّاتِ، وَبِمَا أَظْهَرْتَ فِي الْوُجُوْدِ لِكُلِّ مَوْجُوْدٍ مِنَ الْآيَاتِ الْبَيِّنَاتِ، وَبِخَفِيِّ لُطْفِكَ الْمُفَرِّجِ عَنْ كُلِّ مَهْمُوْمٍ، الْمُخَلِّصِ لِكُلِّ مَدْيُوْنٍ.',
+  'يَا مُجْرِيَ الْبِحَارِ وَالْعُيُوْنِ، يَا مَنْ خَزَائِنُهُ بَيْنَ الْكَافِ وَالنُّوْنِ، وَعَلِمَ بِمَا كَانَ قَبْلَ أَنْ يَكُوْنَ.',
+  'وَنَسْأَلُكَ اللّٰهُمَّ أَنْ تَسْلُكَ بِنَا جَادَّةَ رِضَاكَ، وَأَنْ تَجْعَلَنَا أَهْلًا وَمَحَلًّا لِسَعَادَتِكَ وَغِنَاكَ، وَأَنْ تُيَسِّرَ لَنَا جَمِيْعَ الْمُرَادَاتِ وَالْمَطَالِبِ، وَأَنْ تَجْعَلَ رِضَاكَ عَنَّا خَيْرَ مُصَاحِبٍ لَنَا وَرَفِيْقٍ، وَأَنْ تُتْحِفَنَا بِالْجَلَالَةِ وَالْمَهَابَةِ، وَأَنْ تَمُنَّ عَلَيْنَا بِسُرْعَةِ الْإِجَابَةِ.',
+  'اِسْتَجِبِ اللّٰهُمَّ دُعَاءَنَا، وَحَقِّقْ فِيْكَ رَجَاءَنَا، وَأَدْخِلْنَا فِيْ حِرْزِ لُطْفِكَ الْمَصُوْنِ، بِسِرِّ قَوْلِكَ: إِنَّمَا أَمْرُهُ إِذَا أَرَادَ شَيْئًا أَنْ يَقُوْلَ لَهُ كُنْ فَيَكُوْنُ، فَسُبْحَانَ الَّذِيْ بِيَدِهِ مَلَكُوْتُ كُلِّ شَيْءٍ وَإِلَيْهِ تُرْجَعُوْنَ.',
+  'سُبْحَانَ الْمُنَفِّسِ عَنْ كُلِّ مَهْمُوْمٍ، سُبْحَانَ الْمُنَفِّسِ عَنْ كُلِّ مَدْيُوْنٍ، سُبْحَانَ مَنْ أَمْرُهُ إِذَا أَرَادَ شَيْئًا أَنْ يَقُوْلَ لَهُ كُنْ فَيَكُوْنُ.',
+  'يَا مُفَرِّجَ الْهُمُوْمِ، يَا مُفَرِّجُ فَرِّجْ، يَا مُفَرِّجُ فَرِّجْ، فَرِّجْ عَنَّا هُمُوْمَنَا، يَا حَيُّ يَا قَيُّوْمُ، يَا ذَا الْجَلَالِ وَالْإِكْرَامِ.',
+  'وَصَلَّى اللّٰهُ عَلٰى سَيِّدِنَا مُحَمَّدٍ، وَعَلٰى آلِهِ وَصَحْبِهِ وَسَلَّمَ، وَالْحَمْدُ لِلّٰهِ رَبِّ الْعٰلَمِيْنَ.'
+ ],
+ tr:[
+  'Dengan nama Allah Yang Maha Pemurah lagi Maha Penyayang.',
+  'Segala puji bagi Allah, Tuhan sekalian alam, pujian yang menyamai nikmat-Nya dan mencukupi tambahan kurnia-Nya. Wahai Tuhan kami, bagi-Mu segala puji sebagaimana layak bagi kebesaran wajah-Mu dan keagungan kekuasaan-Mu. Ya Allah, limpahkan selawat dan salam ke atas penghulu kami Muhammad, keluarga dan seluruh sahabatnya.',
+  'Ya Allah, dengan kemuliaan Yasin dan al-Quran yang penuh hikmah, dengan kemuliaan orang yang Engkau pilih untuk risalah, kenabian, kewalian dan memberi petunjuk ke jalan-Mu yang lurus, dan dengan segala yang dibawa Jibril daripada-Mu, iaitu wahyu yang diturunkan oleh Tuhan Yang Maha Perkasa lagi Maha Penyayang.',
+  'Dengan keistimewaan huruf-huruf dan nama-nama-Mu yang sempurna, dengan tanda-tanda yang nyata yang Engkau zahirkan dalam kewujudan kepada setiap yang wujud, dan dengan kelembutan-Mu yang tersembunyi, yang melapangkan setiap orang yang berdukacita dan membebaskan setiap orang yang berhutang.',
+  'Wahai Tuhan yang mengalirkan lautan dan mata air, wahai Tuhan yang perbendaharaan-Nya di antara kaf dan nun ("kun" — jadilah), dan Dia mengetahui sesuatu sebelum ia wujud.',
+  'Kami memohon kepada-Mu ya Allah: bawalah kami melalui jalan keredaan-Mu; jadikanlah kami layak dan tempat yang menerima kebahagiaan dan kekayaan-Mu; permudahkanlah bagi kami segala hajat dan permintaan; jadikanlah keredaan-Mu terhadap kami sebaik-baik sahabat dan teman kami; kurniakanlah kami kemuliaan dan kewibawaan; dan anugerahkanlah kami dengan doa yang segera dimakbulkan.',
+  'Perkenankanlah doa kami ya Allah, tunaikanlah harapan kami kepada-Mu, dan masukkanlah kami ke dalam benteng kelembutan-Mu yang terpelihara, dengan rahsia firman-Mu: "Sesungguhnya urusan-Nya, apabila Dia menghendaki sesuatu, Dia hanya berkata kepadanya: Jadilah! Maka jadilah ia. Maka Maha Suci Tuhan yang di tangan-Nya kekuasaan atas segala sesuatu, dan kepada-Nya kamu dikembalikan." (Yasin: 82–83)',
+  'Maha Suci Tuhan yang melapangkan setiap orang yang berdukacita. Maha Suci Tuhan yang melapangkan setiap orang yang berhutang. Maha Suci Tuhan yang urusan-Nya, apabila Dia menghendaki sesuatu, Dia berkata kepadanya "Jadilah!", maka jadilah ia.',
+  'Wahai Tuhan yang melapangkan segala dukacita. Wahai Yang Melapangkan, lapangkanlah. Wahai Yang Melapangkan, lapangkanlah. Lapangkanlah daripada kami dukacita kami, wahai Yang Maha Hidup, wahai Yang Maha Berdiri Sendiri, wahai Tuhan yang memiliki kebesaran dan kemuliaan.',
+  'Semoga Allah melimpahkan selawat dan salam ke atas penghulu kami Muhammad, keluarga dan sahabatnya. Segala puji bagi Allah, Tuhan sekalian alam.'
+ ]}
+];
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+let fs=LS.get('doa_fs',30), trOn=LS.get('doa_tr',true), cur=null;
+function applyFs(){document.documentElement.style.setProperty('--ars',fs+'px');}
+$('dCards').innerHTML=DOA.map((d,i)=>`<button class="dcard" data-i="${i}"><b>${d.title}</b><span>${d.sub}</span></button>`).join('');
+$('dCards').querySelectorAll('button').forEach(b=>b.onclick=()=>open(+b.dataset.i));
+function open(i){
+  const d=DOA[i];cur=i;LS.set('doa_last',i);
+  $('dTitle').textContent=d.title;$('dSub').textContent=d.sub;
+  $('dAr').innerHTML=d.ar.map(p=>typeof p==='string'?`<p>${esc(p)}</p>`:p.i?`<div class="inst">${esc(p.i)}</div>`:`<p>${esc(p.t)}<span class="rep">${p.x}</span></p>`).join('');
+  $('dTr').innerHTML='<h4>Terjemahan</h4>'+d.tr.map(p=>typeof p==='string'?`<p>${esc(p)}</p>`:`<p class="inst">${esc(p.i)}</p>`).join('');
+  $('dSrc').textContent='Sumber: '+d.src;
+  $('dList').classList.add('hide');$('dView').classList.remove('hide');window.scrollTo(0,0);
+}
+$('dBack').onclick=()=>{$('dView').classList.add('hide');$('dList').classList.remove('hide');window.scrollTo(0,0);};
+$('dMinus').onclick=()=>{fs=Math.max(20,fs-2);LS.set('doa_fs',fs);applyFs();};
+$('dPlus').onclick=()=>{fs=Math.min(48,fs+2);LS.set('doa_fs',fs);applyFs();};
+$('dTrOn').checked=trOn; const showTr=()=>$('dTr').classList.toggle('hide',!trOn);
+$('dTrOn').onchange=()=>{trOn=$('dTrOn').checked;LS.set('doa_tr',trOn);showTr();};
+applyFs();showTr();
+})();
+</script>
+
 
 
 
