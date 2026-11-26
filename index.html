@@ -1125,6 +1125,7 @@ let natT=null;
 function natSchedule(){if(!LN)return;clearTimeout(natT);natT=setTimeout(natDo,800);}
 async function natDo(){
   try{
+    natWidget();
     const pend=await LN.getPending();
     if(pend.notifications&&pend.notifications.length)await LN.cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
     if(natPerm!=='granted')return;
@@ -1141,6 +1142,17 @@ async function natDo(){
     if(list.length)await LN.schedule({notifications:list});
     LS.set('nat_sched',{n:list.length,at:now,until:list.length?Math.max(...list.map(x=>+x.schedule.at)):0});
   }catch(e){setStatus('Gagal menjadualkan azan: '+(e.message||e),1);}
+}
+/* data untuk widget skrin utama (APK) */
+const WG=NAT?window.Capacitor.registerPlugin('MyqWidget'):null;
+async function natWidget(){
+  if(!WG)return;
+  try{
+    const ks=Object.keys(days).filter(k=>k>=ymd(Date.now()-864e5)).sort().slice(0,32), D={};
+    ks.forEach(k=>{const t=days[k];D[k]={t:MAIN.map(x=>t[x]),h:hijriTxt(t.hijri),g:new Date(Date.parse(k+'T12:00:00+08:00')).toLocaleDateString('ms-MY',{weekday:'long',day:'numeric',month:'short',year:'numeric',timeZone:TZ})};});
+    const z=(zones||[]).find(x=>x.jakimCode===cfg.zone), q=window.QIB&&window.QIB.q();
+    await WG.setData({data:JSON.stringify({zone:z?`${(z.daerah||'').split(',')[0]} (${cfg.zone})`:cfg.zone,qibla:q!=null?q.toFixed(0)+'°':'',days:D})});
+  }catch(e){}
 }
 async function natPermAsk(){if(!LN)return;try{const p=await LN.requestPermissions();natPerm=p.display;}catch(e){}permTxt();natSchedule();}
 if(NAT){
@@ -1935,7 +1947,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState!==
 const $=id=>document.getElementById(id);
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const VER='v18';
+const VER='v19';
 const NAT=!!window.__NAT, CP=NAT?window.Capacitor:null;
 const plug=n=>CP?((CP.Plugins&&CP.Plugins[n])||CP.registerPlugin(n)):null;
 if(NAT){ /* navigator.share dalam WebView APK -> plugin Share */
