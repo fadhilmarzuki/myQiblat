@@ -3,7 +3,7 @@
 <head>
 <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b3d2e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -18,7 +18,7 @@
 <style>
 :root{--bg:#0b3d2e;--bg2:#0f4f3c;--card:#135943;--gold:#e8c468;--txt:#f3f1e8;--mut:#b7cfc4;--ok:#3ddc84;--warn:#ffb347}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none;max-width:100%;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
 body{padding:calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 20px);max-width:520px;margin:0 auto}
 h1{font-size:1.25rem;text-align:center;letter-spacing:.5px}
 .sub{text-align:center;color:var(--mut);font-size:.82rem;margin-top:2px}
@@ -93,6 +93,7 @@ nav.tabs button i{font-size:1.25rem}
 .mitem .arb{margin-top:8px}
 .mitem .arb .bsm{display:block;text-align:center;margin-bottom:.2em}
 .tnm{color:var(--gold);font-weight:700;unicode-bidi:isolate}
+.nat .fsBtn,.nat #installBtn{display:none!important}
 .gearBtn{position:absolute;left:0;top:2px;background:var(--card);border:1px solid #ffffff33;color:var(--txt);border-radius:10px;padding:5px 10px;font-size:.95rem}
 .hijToday{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}.hijToday b{color:var(--gold);font-size:1.05rem}.hijToday span{color:var(--mut);font-size:.82rem}
 .hfast{margin-top:8px;background:#3ddc8422;border:1px solid #3ddc8466;border-radius:10px;padding:7px 10px;font-size:.85rem}.hfast.bad{background:#ff6b6b22;border-color:#ff6b6b66}
@@ -495,7 +496,7 @@ nav.tabs button i{font-size:1.25rem}
 </div>
 <div class="ovl hide" id="ovl"><div class="box"><div class="small" id="ovlSub">Telah masuk waktu</div><h2 id="ovlName">Zohor</h2><div class="small" id="ovlZone"></div><button class="btn" id="ovlStop">⏹ Hentikan</button></div></div>
 
-<script>window.__myqNew=!localStorage.getItem('qiblat_loc')&&!localStorage.getItem('ws_cfg')&&!localStorage.getItem('onb_done');</script>
+<script>window.__NAT=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());if(window.__NAT)document.documentElement.classList.add('nat');window.__myqNew=!localStorage.getItem('qiblat_loc')&&!localStorage.getItem('ws_cfg')&&!localStorage.getItem('onb_done');</script>
 <script>
 (function(){
 const KAABA={lat:21.422524,lon:39.826206};
@@ -690,7 +691,7 @@ $('mBtn').onclick=()=>{const a=parseFloat($('mLat').value),b=parseFloat($('mLon'
   if(isFinite(a)&&isFinite(b)&&Math.abs(a)<=90&&Math.abs(b)<=180) setLoc(a,b,null); else $('status').textContent='Koordinat tidak sah.';};
 try{const s=JSON.parse(localStorage.getItem('qiblat_loc'));if(s)setLoc(s.lat,s.lon,null);}catch(e){}
 /* PWA */
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+if('serviceWorker' in navigator&&!window.__NAT){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBtn').classList.remove('hide');});
 $('installBtn').onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$('installBtn').classList.add('hide');};
@@ -718,7 +719,7 @@ const HM=['Muharam','Safar','Rabiulawal','Rabiulakhir','Jamadilawal','Jamadilakh
 const FALLBACK={Johor:'JHR01 JHR02 JHR03 JHR04',Kedah:'KDH01 KDH02 KDH03 KDH04 KDH05 KDH06 KDH07',Kelantan:'KTN01 KTN02',Melaka:'MLK01','Negeri Sembilan':'NGS01 NGS02 NGS03',Pahang:'PHG01 PHG02 PHG03 PHG04 PHG05 PHG06 PHG07',Perlis:'PLS01','Pulau Pinang':'PNG01',Perak:'PRK01 PRK02 PRK03 PRK04 PRK05 PRK06 PRK07',Sabah:'SBH01 SBH02 SBH03 SBH04 SBH05 SBH06 SBH07 SBH08 SBH09',Selangor:'SGR01 SGR02 SGR03',Sarawak:'SWK01 SWK02 SWK03 SWK04 SWK05 SWK06 SWK07 SWK08 SWK09',Terengganu:'TRG01 TRG02 TRG03 TRG04','Wilayah Persekutuan':'WLY01 WLY02'};
 
 let cfg=Object.assign({mode:'gps',zone:'',sound:'notif',azanSrc:'app',pre:0,wake:false,bells:{imsak:0,fajr:1,syuruk:0,dhuhr:1,asr:1,maghrib:1,isha:1}},LS.get('ws_cfg',{}));
-const save=()=>LS.set('ws_cfg',cfg);
+const save=()=>{LS.set('ws_cfg',cfg);if(window.__NAT&&typeof natSchedule==='function')natSchedule();};
 let days=LS.get('ws_days',{}); // 'YYYY-MM-DD' -> {hijri, imsak, fajr, ...(ms)}
 let zones=LS.get('ws_zones',null);
 
@@ -849,7 +850,7 @@ async function playAzan(isSubuh){
   au.currentTime=0;
   try{await au.play();return true;}catch(e){chime();return false;}
 }
-function stopAll(){au.pause();au.currentTime=0;$('ovl').classList.add('hide');}
+function stopAll(){au.pause();au.currentTime=0;$('ovl').classList.add('hide');if(window.__NAT&&LN)LN.removeAllDeliveredNotifications().catch(()=>{});}
 $('ovlStop').onclick=stopAll;
 
 /* ---------- pemberitahuan ---------- */
@@ -860,6 +861,7 @@ async function notify(title,body,silent,tag){
 }
 function fire(ev){
   const n=LABEL[ev.key], zone=zoneLabel(cfg.zone);
+  if(window.__NAT){if(!ev.pre&&document.visibilityState==='visible'){$('ovlSub').textContent=MAIN.includes(ev.key)?'Telah masuk waktu':'Peringatan';$('ovlName').textContent=n;$('ovlZone').textContent=`${fmtT(ev.t)} · ${zone}`;$('ovl').classList.remove('hide');setTimeout(()=>$('ovl').classList.add('hide'),60000);}return;}
   if(ev.pre){notify(`${n} dalam ${cfg.pre} minit`,`${n} pada ${fmtT(ev.t)} · ${zone}`,cfg.sound!=='notif',`pre-${ev.key}`); if(document.visibilityState==='visible'&&cfg.sound!=='vib')chime(); return;}
   const isMain=MAIN.includes(ev.key);
   const title=isMain?`Telah masuk waktu ${n}`:(ev.key==='imsak'?'Waktu Imsak':'Syuruk — tamat waktu Subuh');
@@ -909,9 +911,9 @@ async function pickFile(inp,key,lbl){const f=inp.files[0];if(!f)return;try{await
 $('azanFile').onchange=()=>pickFile($('azanFile'),'azan','azanName');
 $('azanSFile').onchange=()=>pickFile($('azanSFile'),'azanS','azanSName');
 (async()=>{const a=await idbGet('azan'),s=await idbGet('azanS');if(a)$('azanName').textContent=a.name;if(s)$('azanSName').textContent=s.name;})();
-function permTxt(){const p=('Notification' in window)?Notification.permission:'unsupported';$('sPerm').textContent=p==='granted'?'✅ Notifikasi dibenarkan':p==='denied'?'⛔ Notifikasi disekat':p==='unsupported'?'Notifikasi tidak disokong':'Benarkan notifikasi';}
-$('sPerm').onclick=async()=>{if('Notification' in window&&Notification.permission==='default')await Notification.requestPermission();permTxt();if(Notification.permission==='denied')setStatus('Notifikasi disekat. Buka tetapan Chrome → Tetapan tapak → Pemberitahuan untuk membenarkan.',1);};
-$('sTest').onclick=async()=>{unlock();if('Notification' in window&&Notification.permission==='default'){await Notification.requestPermission();permTxt();}
+function permTxt(){if(window.__NAT){$('sPerm').textContent=natPerm==='granted'?'✅ Notifikasi dibenarkan':natPerm==='denied'?'⛔ Notifikasi disekat':'Benarkan notifikasi';return;}const p=('Notification' in window)?Notification.permission:'unsupported';$('sPerm').textContent=p==='granted'?'✅ Notifikasi dibenarkan':p==='denied'?'⛔ Notifikasi disekat':p==='unsupported'?'Notifikasi tidak disokong':'Benarkan notifikasi';}
+$('sPerm').onclick=async()=>{if(window.__NAT){await natPermAsk();if(natPerm==='denied')setStatus('Notifikasi disekat. Buka Tetapan telefon → Apl → myQiblat → Pemberitahuan.',1);return;}if('Notification' in window&&Notification.permission==='default')await Notification.requestPermission();permTxt();if(Notification.permission==='denied')setStatus('Notifikasi disekat. Buka tetapan Chrome → Tetapan tapak → Pemberitahuan untuk membenarkan.',1);};
+$('sTest').onclick=async()=>{unlock();if(window.__NAT&&LN){if(natPerm!=='granted')await natPermAsk();try{await LN.schedule({notifications:[{id:999,title:'Ujian bunyi myQiblat',body:'Beginilah bunyi pemberitahuan waktu Zohor. Ketik ⏹ dalam app untuk hentikan.',channelId:chFor('dhuhr'),schedule:{at:new Date(Date.now()+3000),allowWhileIdle:true}}]});setStatus('🔔 Bunyi ujian dalam 3 saat… (boleh tutup app untuk uji)');}catch(e){setStatus('Gagal: '+(e.message||e),1);}return;}if('Notification' in window&&Notification.permission==='default'){await Notification.requestPermission();permTxt();}
   if(!$('ovl').classList.contains('hide')){stopAll();return;}
   fire({key:'dhuhr',t:Date.now()});};
 
@@ -1046,6 +1048,7 @@ function renderRam(){
    <div class="small" style="margin-top:6px">🔔 Peringatan sahur: ${sh?sh+' minit sebelum imsak':'tutup'} · ubah di ⚙️ Tetapan</div>`;
 }
 function sahurCheck(){
+  if(window.__NAT)return;
   const sh=LS.get('ram_sahur',45); if(!sh)return;
   const now=Date.now();
   [ymd(now),addD(ymd(now),1)].forEach(k=>{const t=days[k],h=hOf(k);if(!t||!h||h.m!==9)return;
@@ -1095,6 +1098,53 @@ window.addEventListener('myq-days',()=>{hMap=null;renderTakwim();});
 setInterval(()=>{sahurCheck();if(!$('tabW').classList.contains('hide'))renderRam();},1000);
 setInterval(()=>{if(hMap&&hMap.sig.slice(0,10)!==ymd(Date.now()))renderTakwim();},60000);
 setTimeout(renderTakwim,50);
+
+
+/* ---------- VERSI APK (Capacitor): azan dijadual oleh Android ---------- */
+const NAT=!!window.__NAT;
+const LN=NAT?((window.Capacitor.Plugins&&window.Capacitor.Plugins.LocalNotifications)||window.Capacitor.registerPlugin('LocalNotifications')):null;
+let natPerm='prompt';
+async function natSetup(){
+  if(!LN)return;
+  try{const p=await LN.checkPermissions();natPerm=p.display;}catch(e){}
+  const CH=[['azan','Azan',5,'azan.mp3'],['azan_subuh','Azan Subuh',5,'azan_subuh.mp3'],['notif','Waktu solat (bunyi notifikasi)',4,null],['nada','Waktu solat (nada lembut)',4,'nada.wav'],['getar','Waktu solat (getar sahaja)',4,'senyap.wav'],['peringatan','Peringatan awal & sahur',4,'nada.wav']];
+  for(const [id,name,importance,sound] of CH){try{const o={id,name,importance,visibility:1,vibration:true,lights:true,lightColor:'#e8c468'};if(sound)o.sound=sound;await LN.createChannel(o);}catch(e){}}
+}
+const dayNo=k=>Math.round(Date.parse(k+'T00:00:00Z')/864e5);
+function chFor(key){const isMain=MAIN.includes(key);
+  if(cfg.sound==='azan')return isMain?(key==='fajr'?'azan_subuh':'azan'):'nada';
+  return {notif:'notif',chime:'nada',vib:'getar'}[cfg.sound]||'notif';}
+let natT=null;
+function natSchedule(){if(!LN)return;clearTimeout(natT);natT=setTimeout(natDo,800);}
+async function natDo(){
+  try{
+    const pend=await LN.getPending();
+    if(pend.notifications&&pend.notifications.length)await LN.cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
+    if(natPerm!=='granted')return;
+    const now=Date.now(), zone=zoneLabel(cfg.zone), list=[], sh=LS.get('ram_sahur',45);
+    Object.keys(days).filter(k=>k>=ymd(now)).sort().slice(0,14).forEach(k=>{
+      const t=days[k], base=dayNo(k)*20;
+      ROWS.forEach(([key],ei)=>{
+        if(!cfg.bells[key]||!t[key])return; const at=t[key], n=LABEL[key], isMain=MAIN.includes(key);
+        if(at>now+3000)list.push({id:base+ei,title:isMain?`Telah masuk waktu ${n}`:(key==='imsak'?'Waktu Imsak':'Syuruk — tamat waktu Subuh'),body:`${fmtT(at)} · ${zone}`,channelId:chFor(key),schedule:{at:new Date(at),allowWhileIdle:true},extra:{key,t:at}});
+        if(cfg.pre>0&&isMain&&at-cfg.pre*6e4>now+3000)list.push({id:base+10+ei,title:`${n} dalam ${cfg.pre} minit`,body:`${n} pada ${fmtT(at)} · ${zone}`,channelId:'peringatan',schedule:{at:new Date(at-cfg.pre*6e4),allowWhileIdle:true}});
+      });
+      const h=hOf(k); if(sh&&h&&h.m===9&&t.imsak-sh*6e4>now+3000)list.push({id:base+19,title:'Waktu sahur 🌙',body:`Imsak pada ${fmtT(t.imsak)} (${sh} minit lagi) · ${zone}`,channelId:'peringatan',schedule:{at:new Date(t.imsak-sh*6e4),allowWhileIdle:true}});
+    });
+    if(list.length)await LN.schedule({notifications:list});
+    LS.set('nat_sched',{n:list.length,at:now,until:list.length?Math.max(...list.map(x=>+x.schedule.at)):0});
+  }catch(e){setStatus('Gagal menjadualkan azan: '+(e.message||e),1);}
+}
+async function natPermAsk(){if(!LN)return;try{const p=await LN.requestPermissions();natPerm=p.display;}catch(e){}permTxt();natSchedule();}
+if(NAT){
+  natSetup().then(()=>{permTxt();natSchedule();if(natPerm==='prompt')natPermAsk();});
+  window.addEventListener('myq-days',natSchedule);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')natSchedule();});
+  try{LN.addListener('localNotificationReceived',n=>{const x=n.extra||{};if(x.key&&document.visibilityState==='visible'){$('ovlSub').textContent=MAIN.includes(x.key)?'Telah masuk waktu':'Peringatan';$('ovlName').textContent=LABEL[x.key];$('ovlZone').textContent=`${fmtT(x.t)} · ${zoneLabel(cfg.zone)}`;$('ovl').classList.remove('hide');}});}catch(e){}
+  $('bgNote').className='note';
+  $('bgNote').innerHTML='📱 <b>Versi APK:</b> azan dijadualkan oleh Android untuk 14 hari dan berbunyi walaupun app ditutup. Untuk hasil terbaik: Tetapan telefon → Apl → myQiblat → Bateri → <b>Tanpa had (Unrestricted)</b>. Buka app sekurang-kurangnya seminggu sekali supaya jadual dikemas kini.';
+  const own=$('srcOwn'); if(own){own.disabled=true;own.title='Tidak disokong dalam versi APK';own.textContent='Fail sendiri (web sahaja)';}
+}
 
 window.MYQ={days:()=>days,ymd,fmtT,LABEL,toast};
 
@@ -1877,7 +1927,19 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState!==
 const $=id=>document.getElementById(id);
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const VER='v15';
+const VER='v17';
+const NAT=!!window.__NAT, CP=NAT?window.Capacitor:null;
+const plug=n=>CP?((CP.Plugins&&CP.Plugins[n])||CP.registerPlugin(n)):null;
+if(NAT){ /* navigator.share dalam WebView APK -> plugin Share */
+  const SH=plug('Share');
+  navigator.share=d=>SH.share({title:d.title,text:d.text,url:d.url,dialogTitle:d.title||'Kongsi'});
+  navigator.canShare=d=>!(d&&d.files);
+}
+async function natSave(f){
+  const FS=plug('Filesystem'), SH=plug('Share');
+  const r=await FS.writeFile({path:f.name,data:await f.text(),directory:'CACHE',encoding:'utf8'});
+  await SH.share({title:'Sandaran myQiblat',url:r.uri,dialogTitle:'Simpan / hantar fail sandaran'});
+}
 const EXCL=['ws_days','ws_zones','ws_fired','mq_last','ws_synced','imsk_cache','hij_off','ws_lastpos','ws_tab'];
 const SND={azan:'Azan',notif:'Bunyi notifikasi telefon',chime:'Nada lembut',vib:'Getar sahaja'};
 function goto(tab,id){closeSet();window.showTab&&window.showTab(tab);setTimeout(()=>{const e=$(id);if(e)e.scrollIntoView({behavior:'smooth',block:'center'});},120);}
@@ -1906,11 +1968,11 @@ function render(){
    `<h3 class="sh">Lain-lain</h3>
     <button class="btn sec" id="setGuide">📘 Tunjuk semula panduan kali pertama</button>
     <button class="btn sec" id="setReset" style="border-color:#ff6b6b66">🗑️ Padam semua tetapan & data app</button>
-    <div class="note" style="text-align:center;margin-top:12px">myQiblat ${VER} · Waktu solat: e-Solat JAKIM · Al-Quran: Tanzil</div>`;
+    <div class="note" style="text-align:center;margin-top:12px">myQiblat ${VER}${NAT?' (APK)':''} · Waktu solat: e-Solat JAKIM · Al-Quran: Tanzil</div>`;
   $('setBody').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{const [t,id]=b.dataset.go.split(',');goto(+t,id);});
   $('setSahur').onchange=e=>{LS.set('ram_sahur',+e.target.value);};
-  $('setExp').onclick=()=>{const f=pack();const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);note(`✅ Fail <b>${f.name}</b> disimpan dalam folder Muat Turun (Download).`);};
-  $('setShare').onclick=async()=>{const f=pack();if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Sandaran myQiblat'});note('✅ Dikongsi.');}catch(e){}}else $('setExp').click();};
+  $('setExp').onclick=async()=>{const f=pack();if(NAT){try{await natSave(f);note('✅ Pilih Google Drive, WhatsApp atau Fail untuk simpan sandaran.');}catch(e){if(!/cancel/i.test(e.message||''))note('⚠️ '+esc(e.message||e),1);}return;}const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);note(`✅ Fail <b>${f.name}</b> disimpan dalam folder Muat Turun (Download).`);};
+  $('setShare').onclick=async()=>{const f=pack();if(NAT)return $('setExp').click();if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Sandaran myQiblat'});note('✅ Dikongsi.');}catch(e){}}else $('setExp').click();};
   $('setImpBtn').onclick=()=>$('setImp').click();
   $('setImp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{restore(JSON.parse(await f.text()));}catch(err){note('⚠️ Fail tidak sah: '+esc(err.message),1);}e.target.value='';};
   $('setGuide').onclick=()=>{closeSet();openGuide();};
