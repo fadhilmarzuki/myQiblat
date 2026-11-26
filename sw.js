@@ -1,7 +1,7 @@
-const CACHE='myqiblat-v11';
+const CACHE='myqiblat-v12';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)));self.skipWaiting();});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE&&!x.startsWith('myqiblat-audio')&&!x.startsWith('myqiblat-fonts')).map(x=>caches.delete(x)))));self.clients.claim();});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE&&!x.startsWith('myqiblat-audio')&&!x.startsWith('myqiblat-fonts')&&!x.startsWith('myqiblat-quran')).map(x=>caches.delete(x)))));self.clients.claim();});
 self.addEventListener('fetch',e=>{
   const u=new URL(e.request.url);
   // font Google (Scheherazade New): cache-first supaya teks Arab cantik tanpa internet
